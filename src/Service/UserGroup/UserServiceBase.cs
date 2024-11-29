@@ -1,5 +1,7 @@
 ﻿using Data;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using System.Security.Claims;
 
 namespace Service.UserGroup
@@ -8,12 +10,16 @@ namespace Service.UserGroup
         SignInManager<ApplicationUser> signInManager,
         RoleManager<IdentityRole> roleManager,
         ApplicationDbContext applicationDbContext,
-        TokenSettings tokenSettings)
+        TokenSettings tokenSettings,
+        IConfiguration configuration,
+        ILogger<UserService> logger)
     {
         private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly SignInManager<ApplicationUser> _signInManager = signInManager;
         private readonly RoleManager<IdentityRole> _roleManager = roleManager;
         private readonly TokenSettings _tokenSettings = tokenSettings;
+        private readonly IConfiguration _configuration = configuration;
+        private readonly ILogger<UserService> _logger = logger;
         private readonly ApplicationDbContext _context = applicationDbContext;
 
         private async Task<UserLoginResponse> GenerateUserToken(ApplicationUser user)

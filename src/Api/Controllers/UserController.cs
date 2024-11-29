@@ -18,6 +18,12 @@ namespace Api.Controllers
         }
 
         [HttpPost]
+        public async Task<AppResponse<UserLoginResponse>> ExternalTelegramLogin(TelegramLoginRequest req)
+        {
+            return await _userService.ExternalTelegramLoginAsync(req);
+        }
+
+        [HttpPost]
         public async Task<AppResponse<UserLoginResponse>> Login(UserLoginRequest req)
         {
             return await _userService.UserLoginAsync(req);
