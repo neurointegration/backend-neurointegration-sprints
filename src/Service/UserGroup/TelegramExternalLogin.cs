@@ -42,7 +42,8 @@ namespace Service.UserGroup
                     FirstName = loginRequest.FirstName,
                     LastName = loginRequest.LastName,
                     UserName = loginRequest.UserName,
-                    TelegramId = loginRequest.Id
+                    TelegramId = loginRequest.Id,
+                    PhotoUrl = loginRequest.PhotoUrl
                 };
                 await _userManager.CreateAsync(telegramUser);
                 await _userManager.AddLoginAsync(telegramUser, info);

@@ -34,6 +34,7 @@ namespace Api.Controllers
         {
             return await _userService.UserRefreshTokenAsync(req);
         }
+
         [HttpPost]
         public async Task<AppResponse<bool>> Logout()
         {

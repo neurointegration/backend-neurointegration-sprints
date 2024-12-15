@@ -1,4 +1,5 @@
 using Data;
+using Data.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -20,11 +21,12 @@ namespace Api
             var appSettings = builder.Configuration.GetSection("TokenSettings").Get<TokenSettings>() ?? default!;
             builder.Services.AddSingleton(appSettings);
 
+            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                            options.UseInMemoryDatabase("AppDb"));
+                            options.UseNpgsql(connectionString));
 
             builder.Services.AddIdentityCore<ApplicationUser>()
-                .AddRoles<IdentityRole>()
+                .AddRoles<Role>()
                 .AddSignInManager()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddTokenProvider<DataProtectorTokenProvider<ApplicationUser>>("REFRESHTOKENPROVIDER");
@@ -56,7 +58,17 @@ namespace Api
                 });
 
             builder.Services.AddScoped<ApplicationDbContextInitialiser>();
+
+            builder.Services.AddScoped<ISprintRepository, SprintRepository>();
+            builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
+            builder.Services.AddScoped<ITaskRepository, TaskRepository>();
+
+            builder.Services.AddScoped<IUserManagementService, UserManagementService>();
+            builder.Services.AddScoped<ISprintService, SprintService>();
+            builder.Services.AddScoped<IProjectService, ProjectService>();
+            builder.Services.AddScoped<ITaskService, TaskService>();
             builder.Services.AddTransient<UserService>();
+
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
 

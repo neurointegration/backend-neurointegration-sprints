@@ -1,0 +1,31 @@
+services:
+  db:
+    image: postgres
+    container_name: neurosprints_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: testuser
+      POSTGRES_PASSWORD: testpassword
+      POSTGRES_DB: neurosprints
+    ports:
+      - "5433:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  api:
+    build:
+      context: .
+      dockerfile: src/Api/Dockerfile
+    container_name: neurosprints_api
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__DefaultConnection: Host=db;Port=5432;Database=neurosprints;Username=testuser;Password=testpassword
+      Telegram__BotToken: ${Telegram__BotToken}
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+
+volumes:
+  db_data:

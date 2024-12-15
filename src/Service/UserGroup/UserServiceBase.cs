@@ -8,7 +8,7 @@ namespace Service.UserGroup
 {
     public partial class UserService(UserManager<ApplicationUser> userManager,
         SignInManager<ApplicationUser> signInManager,
-        RoleManager<IdentityRole> roleManager,
+        RoleManager<Role> roleManager,
         ApplicationDbContext applicationDbContext,
         TokenSettings tokenSettings,
         IConfiguration configuration,
@@ -16,7 +16,7 @@ namespace Service.UserGroup
     {
         private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly SignInManager<ApplicationUser> _signInManager = signInManager;
-        private readonly RoleManager<IdentityRole> _roleManager = roleManager;
+        private readonly RoleManager<Role> _roleManager = roleManager;
         private readonly TokenSettings _tokenSettings = tokenSettings;
         private readonly IConfiguration _configuration = configuration;
         private readonly ILogger<UserService> _logger = logger;
