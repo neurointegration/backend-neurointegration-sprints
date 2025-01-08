@@ -12,6 +12,7 @@ namespace Data
         public Guid Id { get; set; }
         public SectionName SectionName { get; set; }
         public string Title { get; set; } = default!;
+        public string? TotalTime { get; set; }
         public string? PlanningTimes { get; set; }
         public string? FactTimes { get; set; }
 

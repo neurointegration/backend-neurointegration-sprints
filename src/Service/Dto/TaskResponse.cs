@@ -12,6 +12,7 @@ namespace Service.Dto
         public Guid Id { get; set; }
         public string Title { get; set; } = default!;
         public SectionName SectionName { get; set; }
+        public PlanningTimeDto? TotalTime { get; set; }
         public Dictionary<int, PlanningTimeDto>? PlanningTimes { get; set; }
         public Dictionary<int, FactTimeDto>? FactTimes { get; set; }
     }
