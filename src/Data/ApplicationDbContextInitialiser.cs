@@ -93,6 +93,36 @@ namespace Data
                 }
             }
 
+            var trainer = new ApplicationUser
+            {
+                UserName = "trainer",
+                Email = "trainer",
+                Clients = new List<ApplicationUser>()
+            };
+            trainer.Clients.Add(client);
+
+            if (_userManager.Users.All(u => u.UserName != trainer.UserName))
+            {
+                await _userManager.CreateAsync(trainer, "Trainer1!");
+                if (!string.IsNullOrWhiteSpace(trainerRole.Name))
+                {
+                    await _userManager.AddToRolesAsync(trainer, new[] { trainerRole.Name });
+                }
+            }
+
+            var comment = new TrainerComment
+            {
+                Id = Guid.NewGuid(),
+                CommentText = "Я комментарий",
+                Client = client,
+                Trainer = trainer
+            };
+
+            if (!await _context.TrainerComments.AnyAsync(c => c.ClientId == client.Id))
+            {
+                await _context.TrainerComments.AddAsync(comment);
+            }
+
             var sprint = new Sprint
             {
                 Id = Guid.Parse("6b5a7b83-371a-4033-a3c5-f4cf656855d8"),

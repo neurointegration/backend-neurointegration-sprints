@@ -6,6 +6,7 @@ namespace Data
 {
     public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : IdentityDbContext<ApplicationUser, Role, Guid>(options)
     {
+        public DbSet<TrainerComment> TrainerComments { get; set; }
         public DbSet<Sprint> Sprints { get; set; }
         public DbSet<Project> Projects { get; set; }
         public DbSet<NeuroTask> NeuroTasks { get; set; }

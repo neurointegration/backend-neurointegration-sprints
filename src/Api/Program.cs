@@ -13,7 +13,7 @@ namespace Api
 {
     public class Program
     {
-        public static async Task Main(string[] args)
+            public static async Task Main(string[] args)
         {
 
             var builder = WebApplication.CreateBuilder(args);
@@ -67,6 +67,7 @@ namespace Api
             builder.Services.AddScoped<ISprintService, SprintService>();
             builder.Services.AddScoped<IProjectService, ProjectService>();
             builder.Services.AddScoped<ITaskService, TaskService>();
+            builder.Services.AddScoped<ITrainerCommentService, TrainerCommentService>();
             builder.Services.AddTransient<UserService>();
 
             builder.Services.AddControllers();
