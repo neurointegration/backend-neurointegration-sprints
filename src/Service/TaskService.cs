@@ -42,7 +42,6 @@ namespace Service
                 ProjectId = request.ProjectId,
                 Title = request.Title,
                 SectionName = request.SectionName,
-                TotalTime = request.TotalTime != null ? SerializePlanningTimeDto(request.TotalTime) : null,
                 PlanningTimes = ConvertDictionaryToJson(request.PlanningTimes),
                 FactTimes = ConvertDictionaryToJson(request.FactTimes)
             };
@@ -59,7 +58,6 @@ namespace Service
 
             existingTask.Title = request.Title ?? existingTask.Title;
             existingTask.SectionName = request.SectionName ?? existingTask.SectionName;
-            existingTask.TotalTime = request.TotalTime != null ? SerializePlanningTimeDto(request.TotalTime) : existingTask.TotalTime;
             existingTask.PlanningTimes = ConvertDictionaryToJson(request.PlanningTimes) ?? existingTask.PlanningTimes;
             existingTask.FactTimes = ConvertDictionaryToJson(request.FactTimes) ?? existingTask.FactTimes;
 
@@ -75,36 +73,25 @@ namespace Service
                 Id = task.Id,
                 Title = task.Title,
                 SectionName = task.SectionName,
-                TotalTime = string.IsNullOrEmpty(task.TotalTime) ? null : DeserializePlanningTimeDto(task.TotalTime),
                 PlanningTimes = ConvertJsonToDictionary<PlanningTimeDto>(task.PlanningTimes),
                 FactTimes = ConvertJsonToDictionary<FactTimeDto>(task.FactTimes)
             };
         }
 
-        private Dictionary<int, T>? ConvertJsonToDictionary<T>(string? json)
+        private Dictionary<String, T>? ConvertJsonToDictionary<T>(string? json)
         {
             if (string.IsNullOrEmpty(json))
                 return null;
 
-            return System.Text.Json.JsonSerializer.Deserialize<Dictionary<int, T>>(json);
+            return System.Text.Json.JsonSerializer.Deserialize<Dictionary<String, T>>(json);
         }
 
-        private string? ConvertDictionaryToJson<T>(Dictionary<int, T>? dictionary)
+        private string? ConvertDictionaryToJson<T>(Dictionary<String, T>? dictionary)
         {
             if (dictionary == null)
                 return null;
 
             return System.Text.Json.JsonSerializer.Serialize(dictionary);
-        }
-
-        private string SerializePlanningTimeDto(PlanningTimeDto dto)
-        {
-            return System.Text.Json.JsonSerializer.Serialize(dto);
-        }
-
-        private PlanningTimeDto DeserializePlanningTimeDto(string json)
-        {
-            return System.Text.Json.JsonSerializer.Deserialize<PlanningTimeDto>(json)!;
         }
     }
 }
