@@ -14,5 +14,7 @@ namespace Service
         Task<bool> UpdateUserPropertiesAsync(Guid userId, UserUpdateRequest request);
         Task<UserResponse?> GetUserByIdAsync(Guid userId);
         Task<IList<String>> GetUserRolesAsync(Guid userId);
+        Task AssignTrainerAsync(Guid userId, string trainerUsername);
+        Task<TrainerResponse?> GetTrainerAsync(Guid userId);
     }
 }

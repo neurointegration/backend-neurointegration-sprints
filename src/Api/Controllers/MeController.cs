@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Service.Dto;
 using Service;
 using Api.Extensions;
+using Service.Exceptions;
 
 namespace Api.Controllers
 {
@@ -16,6 +17,36 @@ namespace Api.Controllers
         public MeController(IUserManagementService userManagementService)
         {
             _userManagementService = userManagementService;
+        }
+
+        [HttpPost("trainer")]
+        public async Task<IActionResult> AssignTrainer([FromBody] AssignTrainerRequest request)
+        {
+            var userId = User.GetUserId();
+
+            try
+            {
+                await _userManagementService.AssignTrainerAsync(userId, request.TrainerUsername);
+                return Ok("Trainer assigned successfully.");
+            }
+            catch (TrainerNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (TrainerNotInBotException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet("trainer")]
+        public async Task<IActionResult> GetTrainer()
+        {
+            var userId = User.GetUserId();
+            var trainer = await _userManagementService.GetTrainerAsync(userId);
+            if (trainer == null)
+                return NotFound("No trainer assigned to the current user.");
+            return Ok(trainer);
         }
 
         [HttpGet]

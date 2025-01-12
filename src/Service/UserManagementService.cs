@@ -1,21 +1,92 @@
 ﻿using Data;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Service.Dto;
+using Service.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Json;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Service
 {
+    public class BotTrainerResponse
+    {
+        public string Username { get; set; } = default!;
+    }
+
     public class UserManagementService : IUserManagementService
     {
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IConfiguration _configuration;
 
-        public UserManagementService(UserManager<ApplicationUser> userManager)
+        public UserManagementService(UserManager<ApplicationUser> userManager, IConfiguration configuration)
         {
             _userManager = userManager;
+            _configuration = configuration;
+        }
+
+        public async Task AssignTrainerAsync(Guid userId, string trainerUsername)
+        {
+            var trainer = await _userManager.FindByNameAsync(trainerUsername.Substring(1));
+            if (trainer == null)
+            {
+                throw new TrainerNotFoundException($"Trainer with username '{trainerUsername.Substring(1)}' is not registered.");
+            }
+
+            var botTrainersUrl = _configuration["BotIntegration:TrainersUrl"];
+            if (string.IsNullOrEmpty(botTrainersUrl))
+            {
+                throw new InvalidOperationException("BotIntegration:TrainersUrl is not configured.");
+            }
+
+            using var httpClient = new HttpClient();
+            var response = await httpClient.GetAsync(botTrainersUrl);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new Exception("Failed to fetch trainers from bot.");
+            }
+
+            var botTrainers = await response.Content.ReadFromJsonAsync<List<BotTrainerResponse>>();
+            if (botTrainers == null || !botTrainers.Any(bt => bt.Username == trainerUsername))
+            {
+                throw new TrainerNotInBotException($"Trainer with username '{trainerUsername}' is not listed in the bot.");
+            }
+
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+            if (user == null)
+            {
+                throw new UserNotFoundException($"User with ID '{userId}' is not found.");
+            }
+
+            user.TrainerId = trainer.Id;
+            await _userManager.UpdateAsync(user);
+        }
+
+        public async Task<TrainerResponse?> GetTrainerAsync(Guid userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+            if (user == null)
+                throw new UserNotFoundException("User not found.");
+
+            if (user.TrainerId == null)
+                return null;
+
+            var trainer = await _userManager.FindByIdAsync(user.TrainerId.ToString()!);
+            if (trainer == null)
+                return null;
+
+            return new TrainerResponse
+            {
+                Id = trainer.Id,
+                Username = trainer.UserName,
+                FirstName = trainer.FirstName,
+                LastName = trainer.LastName,
+                AboutMe = trainer.AboutMe
+            };
         }
 
         public async Task<bool> AssignRolesAsync(Guid userId, RoleOption roleOption)
