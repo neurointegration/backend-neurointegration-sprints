@@ -15,6 +15,6 @@ namespace Service
         Task<UserResponse?> GetUserByIdAsync(Guid userId);
         Task<IList<String>> GetUserRolesAsync(Guid userId);
         Task AssignTrainerAsync(Guid userId, string trainerUsername);
-        Task<TrainerResponse?> GetTrainerAsync(Guid userId);
+        Task<ClientResponse?> GetTrainerAsync(Guid userId);
     }
 }

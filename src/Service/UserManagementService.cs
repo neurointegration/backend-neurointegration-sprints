@@ -66,7 +66,7 @@ namespace Service
             await _userManager.UpdateAsync(user);
         }
 
-        public async Task<TrainerResponse?> GetTrainerAsync(Guid userId)
+        public async Task<ClientResponse?> GetTrainerAsync(Guid userId)
         {
             var user = await _userManager.FindByIdAsync(userId.ToString());
             if (user == null)
@@ -79,7 +79,7 @@ namespace Service
             if (trainer == null)
                 return null;
 
-            return new TrainerResponse
+            return new ClientResponse
             {
                 Id = trainer.Id,
                 Username = trainer.UserName,

@@ -68,6 +68,7 @@ namespace Api
             builder.Services.AddScoped<IProjectService, ProjectService>();
             builder.Services.AddScoped<ITaskService, TaskService>();
             builder.Services.AddScoped<ITrainerCommentService, TrainerCommentService>();
+            builder.Services.AddScoped<ITrainerService, TrainerService>();
             builder.Services.AddTransient<UserService>();
 
             builder.Services.AddControllers();
