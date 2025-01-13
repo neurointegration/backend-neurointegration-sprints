@@ -37,6 +37,8 @@ namespace Data.Repositories
         public async Task<IList<Sprint>> GetSprintsByUserIdAsync(Guid userId)
         {
             return await _dbContext.Sprints
+                .Where(s => s.UserId == userId)
+                .OrderByDescending(s => s.BeginDate)
                 .ToListAsync();
         }
     }
