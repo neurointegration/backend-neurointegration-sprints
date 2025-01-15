@@ -85,16 +85,6 @@ namespace Api
                 });
             });
 
-            builder.Services.AddCors(options =>
-            {
-                options.AddPolicy("AllowAll", builder =>
-                {
-                    builder.AllowAnyOrigin()
-                           .AllowAnyHeader()
-                           .AllowAnyMethod();
-                });
-            });
-
             builder.Services.AddSwaggerGen(config =>
             {
                 config.SwaggerDoc("v1", new OpenApiInfo() { Title = "App Api", Version = "v1" });
@@ -134,8 +124,7 @@ namespace Api
                 await initialiser.SeedAsync();
             }
             app.UseHttpsRedirection();
-            // app.UseCors("webAppRequests");
-            app.UseCors("AllowAll");
+            app.UseCors("webAppRequests");
             app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllers();

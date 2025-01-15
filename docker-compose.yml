@@ -22,8 +22,12 @@ services:
       ASPNETCORE_ENVIRONMENT: Development
       ConnectionStrings__DefaultConnection: Host=db;Port=5432;Database=neurosprints;Username=testuser;Password=testpassword
       Telegram__BotToken: ${Telegram__BotToken}
+      BotIntegration__TrainersUrl: ${BotIntegration__TrainersUrl}
+      BotIntegration__SprintsUrl: ${BotIntegration__SprintsUrl}
+      BotIntegration__SprintsUpdateTimeInMinutes: ${BotIntegration__SprintsUpdateTimeInMinutes}
+      TokenSettings__Audience: ${TokenSettings__Audience}
     ports:
-      - "8080:8080"
+      - "80:8080"
     depends_on:
       - db
 
