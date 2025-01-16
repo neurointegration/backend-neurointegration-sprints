@@ -123,7 +123,6 @@ namespace Api
                 await initialiser.InitialiseAsync();
                 await initialiser.SeedAsync();
             }
-            app.UseHttpsRedirection();
             app.UseCors("webAppRequests");
             app.UseAuthentication();
             app.UseAuthorization();
