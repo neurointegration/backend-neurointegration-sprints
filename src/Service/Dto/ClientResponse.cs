@@ -13,6 +13,7 @@ namespace Service.Dto
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
         public string? AboutMe { get; set; }
+        public string? PhotoUrl { get; set; }
     }
 }
 

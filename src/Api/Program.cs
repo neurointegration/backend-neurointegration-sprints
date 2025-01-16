@@ -1,3 +1,4 @@
+using AspNetCore.Yandex.ObjectStorage.Extensions;
 using Data;
 using Data.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -70,6 +71,9 @@ namespace Api
             builder.Services.AddScoped<ITrainerCommentService, TrainerCommentService>();
             builder.Services.AddScoped<ITrainerService, TrainerService>();
             builder.Services.AddTransient<UserService>();
+
+            builder.Services.AddYandexObjectStorage(builder.Configuration);
+            builder.Services.AddScoped<AvatarService>();
 
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();

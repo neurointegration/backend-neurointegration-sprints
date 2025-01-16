@@ -41,7 +41,8 @@ namespace Service
                 Username = user.UserName,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
-                AboutMe = user.AboutMe
+                AboutMe = user.AboutMe,
+                PhotoUrl = user.PhotoUrl
             };
         }
     }

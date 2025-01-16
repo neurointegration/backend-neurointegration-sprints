@@ -85,7 +85,8 @@ namespace Service
                 Username = trainer.UserName,
                 FirstName = trainer.FirstName,
                 LastName = trainer.LastName,
-                AboutMe = trainer.AboutMe
+                AboutMe = trainer.AboutMe,
+                PhotoUrl = trainer.PhotoUrl
             };
         }
 

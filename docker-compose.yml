@@ -26,6 +26,8 @@ services:
       BotIntegration__SprintsUrl: ${BotIntegration__SprintsUrl}
       BotIntegration__SprintsUpdateTimeInMinutes: ${BotIntegration__SprintsUpdateTimeInMinutes}
       TokenSettings__Audience: ${TokenSettings__Audience}
+      YandexObjectStorage__AccessKey: ${YandexObjectStorage__AccessKey}
+      YandexObjectStorage__SecretKey: ${YandexObjectStorage__SecretKey}
     ports:
       - "80:8080"
     depends_on:
