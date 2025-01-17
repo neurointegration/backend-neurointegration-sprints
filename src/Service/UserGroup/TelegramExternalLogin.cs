@@ -52,6 +52,7 @@ namespace Service.UserGroup
             {
                 await _userManager.AddLoginAsync(telegramUser, info);
             }
+            _ = Task.Run(() => _backgroundSprintsUpdateService.UpdateSprintForUserAsync(telegramUser));
             var token = await GenerateUserToken(telegramUser);
             return new AppResponse<UserLoginResponse>().SetSuccessResponse(token);
         }

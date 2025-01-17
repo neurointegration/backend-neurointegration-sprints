@@ -72,6 +72,8 @@ namespace Api
             builder.Services.AddScoped<ITrainerService, TrainerService>();
             builder.Services.AddTransient<UserService>();
 
+            builder.Services.AddSingleton<BackgroundSprintsUpdateService>();
+            builder.Services.AddHostedService(provider => provider.GetRequiredService<BackgroundSprintsUpdateService>());
             builder.Services.AddHostedService<BackgroundSprintsUpdateService>();
             builder.Services.AddHttpClient<SprintUpdaterService>();
             builder.Services.AddScoped<ISprintUpdaterService, SprintUpdaterService>();

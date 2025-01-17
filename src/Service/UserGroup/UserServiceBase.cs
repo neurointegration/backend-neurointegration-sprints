@@ -12,7 +12,8 @@ namespace Service.UserGroup
         ApplicationDbContext applicationDbContext,
         TokenSettings tokenSettings,
         IConfiguration configuration,
-        ILogger<UserService> logger)
+        ILogger<UserService> logger,
+        BackgroundSprintsUpdateService backgroundSprintsUpdateService)
     {
         private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly SignInManager<ApplicationUser> _signInManager = signInManager;
@@ -20,6 +21,7 @@ namespace Service.UserGroup
         private readonly TokenSettings _tokenSettings = tokenSettings;
         private readonly IConfiguration _configuration = configuration;
         private readonly ILogger<UserService> _logger = logger;
+        private readonly BackgroundSprintsUpdateService _backgroundSprintsUpdateService = backgroundSprintsUpdateService;
         private readonly ApplicationDbContext _context = applicationDbContext;
 
         private async Task<UserLoginResponse> GenerateUserToken(ApplicationUser user)

@@ -57,11 +57,28 @@ namespace Service
 
             _logger.LogInformation("Sprints Update Service is stopping.");
         }
+
+        public async Task UpdateSprintForUserAsync(ApplicationUser user)
+        {
+            using var scope = _serviceProvider.CreateScope();
+            var sprintUpdaterService = scope.ServiceProvider.GetRequiredService<ISprintUpdaterService>();
+
+            try
+            {
+                _logger.LogInformation("Starting sprint update for user {Username}.", user.UserName);
+                await sprintUpdaterService.UpdateSprintsForUserAsync(user, CancellationToken.None);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while updating sprints for user {Username}.", user.UserName);
+            }
+        }
     }
 
     public interface ISprintUpdaterService
     {
         Task UpdateSprintsAsync(CancellationToken cancellationToken);
+        Task UpdateSprintsForUserAsync(ApplicationUser user, CancellationToken cancellationToken);
     }
 
     public class SprintUpdaterService : ISprintUpdaterService
@@ -82,41 +99,45 @@ namespace Service
         public async Task UpdateSprintsAsync(CancellationToken cancellationToken)
         {
             var users = await _context.Users.ToListAsync(cancellationToken);
-            foreach (var user in users)
+            foreach (ApplicationUser user in users)
             {
-                try
+                await UpdateSprintsForUserAsync(user, cancellationToken);
+            }
+        }
+
+        public async Task UpdateSprintsForUserAsync(ApplicationUser user, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (user.UserName == null)
+                    return;
+                var botSprints = await GetSprintsForUserAsync(user.UserName, cancellationToken);
+                var lastSprintInDb = await _context.Sprints
+                    .Where(s => s.UserId == user.Id)
+                    .OrderByDescending(s => s.BeginDate)
+                    .FirstOrDefaultAsync(cancellationToken);
+                var lastBeginDateInDb = lastSprintInDb?.BeginDate ?? DateOnly.MinValue;
+                var newSprints = botSprints
+                    .Where(s => DateOnly.FromDateTime(s.SprintStartDate) > lastBeginDateInDb)
+                    .ToList();
+                foreach (var tmpSprintDto in newSprints)
                 {
-                    if (user.UserName == null)
-                        continue;
-                    var botSprints = await GetSprintsForUserAsync(user.UserName, cancellationToken);
-                    var lastSprintInDb = await _context.Sprints
-                        .Where(s => s.UserId == user.Id)
-                        .OrderByDescending(s => s.BeginDate)
-                        .FirstOrDefaultAsync(cancellationToken);
-                    var lastBeginDateInDb = lastSprintInDb?.BeginDate ?? DateOnly.MinValue;
-                    var newSprints = botSprints
-                        .Where(s => DateOnly.FromDateTime(s.SprintStartDate) > lastBeginDateInDb)
-                        .ToList();
-                    foreach (var tmpSprintDto in newSprints)
-                    {
-                        var sprint = MapToSprint(tmpSprintDto, user);
-                        await _context.Sprints.AddAsync(sprint, cancellationToken);
-                    }
-                    if (newSprints.Any())
-                    {
-                        await _context.SaveChangesAsync(cancellationToken);
-                        _logger.LogInformation(
-                            "Added {Count} new sprints for user with username {Username}.",
-                            newSprints.Count,
-                            user.UserName
-                        );
-                    }
+                    var sprint = MapToSprint(tmpSprintDto, user);
+                    await _context.Sprints.AddAsync(sprint, cancellationToken);
                 }
-                catch ( HttpRequestException )
+                if (newSprints.Any())
                 {
-                    _logger.LogInformation("User with username {Username} was not found in the bot.", user.UserName);
-                    continue;
+                    await _context.SaveChangesAsync(cancellationToken);
+                    _logger.LogInformation(
+                        "Added {Count} new sprints for user with username {Username}.",
+                        newSprints.Count,
+                        user.UserName
+                    );
                 }
+            }
+            catch (HttpRequestException)
+            {
+                _logger.LogInformation("User with username {Username} was not found in the bot.", user.UserName);
             }
         }
 
