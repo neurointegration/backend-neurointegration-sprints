@@ -72,6 +72,10 @@ namespace Api
             builder.Services.AddScoped<ITrainerService, TrainerService>();
             builder.Services.AddTransient<UserService>();
 
+            builder.Services.AddHostedService<BackgroundSprintsUpdateService>();
+            builder.Services.AddHttpClient<SprintUpdaterService>();
+            builder.Services.AddScoped<ISprintUpdaterService, SprintUpdaterService>();
+
             builder.Services.AddYandexObjectStorage(builder.Configuration);
             builder.Services.AddScoped<AvatarService>();
 
