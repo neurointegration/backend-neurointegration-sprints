@@ -73,15 +73,15 @@ namespace Service.UserGroup
                 dataStringBuilder.Append("\nlast_name=");
                 dataStringBuilder.Append(loginRequest.LastName);
             }
-            if (!string.IsNullOrEmpty(loginRequest.UserName))
-            {
-                dataStringBuilder.Append("\nusername=");
-                dataStringBuilder.Append(loginRequest.UserName);
-            }
             if (!string.IsNullOrEmpty(loginRequest.PhotoUrl))
             {
                 dataStringBuilder.Append("\nphoto_url=");
                 dataStringBuilder.Append(loginRequest.PhotoUrl);
+            }
+            if (!string.IsNullOrEmpty(loginRequest.UserName))
+            {
+                dataStringBuilder.Append("\nusername=");
+                dataStringBuilder.Append(loginRequest.UserName);
             }
 
             var botToken = _configuration["Telegram:BotToken"];
