@@ -9,7 +9,6 @@ namespace Service.Dto
     public class UserUpdateRequest
     {
         public string? FirstName { get; set; }
-        public string? LastName { get; set; }
         public string? AboutMe { get; set; }
         public bool? IsOnboardingComplete { get; set; }
         public int? SprintWeeksCount { get; set; }

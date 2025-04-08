@@ -17,12 +17,12 @@ namespace Api.Controllers
             _sprintService = sprintService;
         }
 
-        [HttpGet("clients/{userId}/sprints/{sprintId}")]
-        public async Task<ActionResult<SprintResponse>> GetSprintById(Guid userId, Guid sprintId)
+        [HttpGet("clients/{userId}/sprints/{sprintNumber}")]
+        public async Task<ActionResult<SprintResponse>> GetSprintById(long userId, long sprintNumber)
         {
             try
             {
-                var sprint = await _sprintService.GetSprintByIdAsync(userId, sprintId);
+                var sprint = await _sprintService.GetSprintByIdAsync(userId, sprintNumber);
                 return Ok(sprint);
             }
             catch (UnauthorizedAccessException)
@@ -32,7 +32,7 @@ namespace Api.Controllers
         }
 
         [HttpGet("clients/{userId}/sprints")]
-        public async Task<ActionResult<IList<SprintResponse>>> GetUserSprints(Guid userId)
+        public async Task<ActionResult<IList<SprintResponse>>> GetUserSprints(long userId)
         {
             var sprints = await _sprintService.GetSprintsByUserIdAsync(userId);
             return Ok(sprints);

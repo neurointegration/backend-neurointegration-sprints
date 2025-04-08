@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
-namespace Service.Dto
+namespace Data
 {
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum TimeStatus
@@ -16,7 +11,7 @@ namespace Service.Dto
         Modify
     }
 
-    public class FactTimeDto
+    public class FactTime
     {
         [Range(0, 100, ErrorMessage = "Hours must be between 0 and 100.")]
         public int Hours { get; set; }

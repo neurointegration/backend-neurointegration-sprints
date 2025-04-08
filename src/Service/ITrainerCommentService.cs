@@ -9,7 +9,7 @@ namespace Service
 {
     public interface ITrainerCommentService
     {
-        Task<CommentResponse?> GetCommentAsync(Guid trainerId, Guid clientId);
-        Task<CommentResponse> CreateOrUpdateCommentAsync(Guid trainerId, UpdateCommentRequest request);
+        Task<CommentResponse?> GetCommentAsync(long trainerId, long clientId);
+        Task<CommentResponse> CreateOrUpdateCommentAsync(long trainerId, UpdateCommentRequest request);
     }
 }

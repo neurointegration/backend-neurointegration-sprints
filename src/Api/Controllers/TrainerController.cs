@@ -28,7 +28,7 @@ namespace Api.Controllers
         }
 
         [HttpGet("clients/{userId}")]
-        public async Task<ActionResult<ClientResponse>> GetClient(Guid userId)
+        public async Task<ActionResult<ClientResponse>> GetClient(long userId)
         {
             var trainerId = User.GetUserId();
             var client = await _trainerService.GetClientAsync(trainerId, userId);

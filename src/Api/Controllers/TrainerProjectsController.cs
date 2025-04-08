@@ -18,7 +18,7 @@ namespace Api.Controllers
         }
 
         [HttpGet("clients/{userId}/projects/{projectId}")]
-        public async Task<ActionResult<ProjectResponse>> GetProjectById(Guid userId, Guid projectId)
+        public async Task<ActionResult<ProjectResponse>> GetProjectById(long userId, Guid projectId)
         {
             var project = await _projectService.GetProjectByIdAsync(projectId);
             if (project == null)
@@ -27,10 +27,10 @@ namespace Api.Controllers
             return Ok(project);
         }
 
-        [HttpGet("clients/{userId}/projects/sprint/{sprintId}")]
-        public async Task<ActionResult<IList<ProjectResponse>>> GetProjectsBySprintId(Guid userId, Guid sprintId)
+        [HttpGet("clients/{userId}/projects/sprint/{sprintNumber}")]
+        public async Task<ActionResult<IList<ProjectResponse>>> GetProjectsBySprintId(long userId, long sprintNumber)
         {
-            var projects = await _projectService.GetProjectsBySprintIdAsync(sprintId);
+            var projects = await _projectService.GetProjectsBySprintAsync(userId, sprintNumber);
             return Ok(projects);
         }
     }

@@ -6,12 +6,12 @@
         public Dictionary<string, string[]> Messages { get; private set; } = [];
 
         public T? Data { get; private set; }
-        internal AppResponse<T> SetSuccessResponse(T data)
+        public AppResponse<T> SetSuccessResponse(T data)
         {
             Data = data;
             return this;
         }
-        internal AppResponse<T> SetSuccessResponse(T data, string key, string value)
+        public AppResponse<T> SetSuccessResponse(T data, string key, string value)
         {
             Data = data;
             Messages.Add(key, [value]);
@@ -29,7 +29,7 @@
             Messages.Add(key, value);
             return this;
         }
-        internal AppResponse<T> SetErrorResponse(string key, string value)
+        public AppResponse<T> SetErrorResponse(string key, string value)
         {
             IsSucceed = false;
             Messages.Add(key, [value]);

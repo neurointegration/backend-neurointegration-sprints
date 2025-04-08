@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Data;
 
 namespace Service.Dto
 {
@@ -10,7 +6,5 @@ namespace Service.Dto
     {
         public int WeeksCount { get; set; }
         public DateOnly BeginDate { get; set; }
-        public DateOnly EndDate { get; set; }
-        public Dictionary<int, SprintWeekDto> Weeks { get; set; } = default!;
     }
 }

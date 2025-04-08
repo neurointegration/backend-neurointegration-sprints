@@ -31,7 +31,7 @@ namespace Api.Controllers
             }
 
             var userId = User.GetUserId();
-            var avatarUrl = await _avatarService.UploadAvatarAsync(userId.ToString(), file);
+            var avatarUrl = await _avatarService.UploadAvatarAsync(userId, file);
 
             return Ok(new { Url = avatarUrl });
         }

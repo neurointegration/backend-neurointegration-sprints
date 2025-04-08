@@ -18,7 +18,7 @@ namespace Api.Controllers
         }
 
         [HttpGet("clients/{userId}/tasks/{taskId}")]
-        public async Task<ActionResult<TaskResponse>> GetTaskById(Guid userId, Guid taskId)
+        public async Task<ActionResult<TaskResponse>> GetTaskById(long userId, Guid taskId)
         {
             var task = await _taskService.GetTaskByIdAsync(taskId);
             if (task == null)
@@ -28,7 +28,7 @@ namespace Api.Controllers
         }
 
         [HttpGet("clients/{userId}/tasks/project/{projectId}")]
-        public async Task<ActionResult<IList<TaskResponse>>> GetTasksByProjectId(Guid userId, Guid projectId)
+        public async Task<ActionResult<IList<TaskResponse>>> GetTasksByProjectId(long userId, Guid projectId)
         {
             var tasks = await _taskService.GetTasksByProjectIdAsync(projectId);
             return Ok(tasks);

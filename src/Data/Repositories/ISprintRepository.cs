@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Data.Repositories
+﻿namespace Data.Repositories
 {
     public interface ISprintRepository
     {
-        Task<Sprint?> GetSprintByIdAsync(Guid id);
+        Task<Sprint?> GetSprintAsync(long userId, long sprintNumber);
         Task CreateSprintAsync(Sprint sprint);
         Task UpdateSprintAsync(Sprint sprint);
-        Task<IList<Sprint>> GetSprintsByUserIdAsync(Guid userId);
+        Task<IList<Sprint>> GetSprintsByUserIdAsync(long userId);
     }
 }

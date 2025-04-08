@@ -4,7 +4,7 @@ namespace Service
 {
     public interface ITrainerService
     {
-        Task<ClientResponse?> GetClientAsync(Guid trainerId, Guid clientId);
-        Task<IList<ClientResponse>> GetClientsAsync(Guid userId);
+        Task<ClientResponse?> GetClientAsync(long trainerId, long clientId);
+        Task<IList<ClientResponse>> GetClientsAsync(long userId);
     }
 }

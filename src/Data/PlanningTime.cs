@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace Service.Dto
+namespace Data
 {
-    public class PlanningTimeDto
+    public class PlanningTime
     {
         [Range(0, 100, ErrorMessage = "Hours must be between 0 and 100.")]
         public int Hours { get; set; }

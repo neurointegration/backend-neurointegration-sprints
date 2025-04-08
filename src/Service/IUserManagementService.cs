@@ -10,11 +10,11 @@ namespace Service
 {
     public interface IUserManagementService
     {
-        Task<bool> AssignRolesAsync(Guid userId, RoleOption roleOption);
-        Task<bool> UpdateUserPropertiesAsync(Guid userId, UserUpdateRequest request);
-        Task<UserResponse?> GetUserByIdAsync(Guid userId);
-        Task<IList<String>> GetUserRolesAsync(Guid userId);
-        Task AssignTrainerAsync(Guid userId, string trainerUsername);
-        Task<ClientResponse?> GetTrainerAsync(Guid userId);
+        Task<bool> AssignRolesAsync(long userId, RoleOption roleOption);
+        Task<bool> UpdateUserPropertiesAsync(long userId, UserUpdateRequest request);
+        Task<UserResponse?> GetUserByIdAsync(long userId);
+        Task<IList<String>> GetUserRolesAsync(long userId);
+        Task AssignTrainerAsync(long userId, string trainerUsername);
+        Task<ClientResponse?> GetTrainerAsync(long userId);
     }
 }

@@ -2,14 +2,14 @@
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace Service.UserGroup
 {
     public static class TokenUtil
     {
-
-        public static string GetToken(TokenSettings appSettings, ApplicationUser user, List<Claim> roleClaims)
+        public static string GenerateAccessToken(TokenSettings appSettings, ApplicationUser user)
         {
             var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(appSettings.SecretKey));
             var signInCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
@@ -17,9 +17,14 @@ namespace Service.UserGroup
             var userClaims = new List<Claim>
             {
                 new("Id", user.Id.ToString()),
-                new ("UserName", user.UserName??"")
+                new ("UserName", user.UserName??""),
+                new (ClaimTypes.Role, "Client")
             };
-            userClaims.AddRange(roleClaims);
+            if (user.IAmCoach)
+            {
+                userClaims.Add(new Claim(ClaimTypes.Role, "Trainer"));
+            }
+
             var tokeOptions = new JwtSecurityToken(
                 issuer: appSettings.Issuer,
                 audience: appSettings.Audience,
@@ -29,6 +34,16 @@ namespace Service.UserGroup
             );
             var tokenString = new JwtSecurityTokenHandler().WriteToken(tokeOptions);
             return tokenString;
+        }
+
+        public static string GenerateRefreshToken()
+        {
+            var randomNumber = new byte[32];
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(randomNumber);
+                return Convert.ToBase64String(randomNumber);
+            }
         }
 
         public static ClaimsPrincipal GetPrincipalFromExpiredToken(TokenSettings appSettings, string token)

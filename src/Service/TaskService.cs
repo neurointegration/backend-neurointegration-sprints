@@ -42,8 +42,8 @@ namespace Service
                 ProjectId = request.ProjectId,
                 Title = request.Title,
                 SectionName = request.SectionName,
-                PlanningTimes = ConvertDictionaryToJson(request.PlanningTimes),
-                FactTimes = ConvertDictionaryToJson(request.FactTimes)
+                PlanningTimes = request.PlanningTimes,
+                FactTimes = request.FactTimes
             };
 
             var createdTask = await _taskRepository.CreateTaskAsync(task);
@@ -58,8 +58,8 @@ namespace Service
 
             existingTask.Title = request.Title ?? existingTask.Title;
             existingTask.SectionName = request.SectionName ?? existingTask.SectionName;
-            existingTask.PlanningTimes = ConvertDictionaryToJson(request.PlanningTimes) ?? existingTask.PlanningTimes;
-            existingTask.FactTimes = ConvertDictionaryToJson(request.FactTimes) ?? existingTask.FactTimes;
+            existingTask.PlanningTimes = request.PlanningTimes ?? existingTask.PlanningTimes;
+            existingTask.FactTimes = request.FactTimes ?? existingTask.FactTimes;
 
             var updatedTask = await _taskRepository.UpdateTaskAsync(existingTask);
 
@@ -73,8 +73,8 @@ namespace Service
                 Id = task.Id,
                 Title = task.Title,
                 SectionName = task.SectionName,
-                PlanningTimes = ConvertJsonToDictionary<PlanningTimeDto>(task.PlanningTimes),
-                FactTimes = ConvertJsonToDictionary<FactTimeDto>(task.FactTimes)
+                PlanningTimes = task.PlanningTimes,
+                FactTimes = task.FactTimes
             };
         }
 

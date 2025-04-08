@@ -1,45 +1,83 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Dapper;
+using System.Data;
 
 namespace Data.Repositories
 {
     public class SprintRepository : ISprintRepository
     {
-        private readonly ApplicationDbContext _dbContext;
+        private readonly IDbConnection _con;
+        private readonly string _sprintsTable = "sprints_info";
 
-        public SprintRepository(ApplicationDbContext dbContext)
+        public SprintRepository(IDbConnection con)
         {
-            _dbContext = dbContext;
+            _con = con;
         }
 
-        public async Task<Sprint?> GetSprintByIdAsync(Guid id)
+        public async Task<Sprint?> GetSprintAsync(long userId, long sprintNumber)
         {
-            return await _dbContext.Sprints
-                .FirstOrDefaultAsync(s => s.Id == id);
+            var sql = $@"
+SELECT 
+    sprint_number AS {nameof(Sprint.Number)},
+    weeks_count AS {nameof(Sprint.WeeksCount)},
+    sprint_start_date AS {nameof(Sprint.BeginDate)},
+    sheet_id AS {nameof(Sprint.SheetId)},
+    user_id AS {nameof(Sprint.UserId)}
+FROM {_sprintsTable}
+WHERE user_id = @UserId AND sprint_number = @SprintNumber";
+
+            var sprint = await _con.QueryFirstOrDefaultAsync<Sprint>(sql, new { UserId = userId, SprintNumber = sprintNumber });
+            return sprint;
         }
 
         public async Task CreateSprintAsync(Sprint sprint)
         {
-            await _dbContext.Sprints.AddAsync(sprint);
-            await _dbContext.SaveChangesAsync();
+            var sql = $@"
+INSERT INTO {_sprintsTable}
+(
+    sprint_number,
+    weeks_count,
+    sprint_start_date,
+    sheet_id,
+    user_id
+)
+VALUES
+(
+    @Number,
+    @WeeksCount,
+    @BeginDate,
+    @SheetId,
+    @UserId
+)";
+            await _con.ExecuteAsync(sql, sprint);
         }
 
         public async Task UpdateSprintAsync(Sprint sprint)
         {
-            _dbContext.Sprints.Update(sprint);
-            await _dbContext.SaveChangesAsync();
+            var sql = $@"
+UPDATE {_sprintsTable}
+SET 
+    weeks_count = @WeeksCount,
+    sprint_start_date = @BeginDate,
+    sheet_id = @SheetId
+WHERE user_id = @UserId AND sprint_number = @Number";
+            await _con.ExecuteAsync(sql, sprint);
         }
 
-        public async Task<IList<Sprint>> GetSprintsByUserIdAsync(Guid userId)
+        public async Task<IList<Sprint>> GetSprintsByUserIdAsync(long userId)
         {
-            return await _dbContext.Sprints
-                .Where(s => s.UserId == userId)
-                .OrderByDescending(s => s.BeginDate)
-                .ToListAsync();
+            var sql = $@"
+SELECT 
+    sprint_number AS {nameof(Sprint.Number)},
+    weeks_count AS {nameof(Sprint.WeeksCount)},
+    sprint_start_date AS {nameof(Sprint.BeginDate)},
+    sheet_id AS {nameof(Sprint.SheetId)},
+    user_id AS {nameof(Sprint.UserId)}
+FROM {_sprintsTable}
+WHERE user_id = @UserId
+ORDER BY sprint_number DESC";
+
+            var sprints = await _con.QueryAsync<Sprint>(sql, new { UserId = userId });
+            return sprints.ToList();
         }
     }
 }

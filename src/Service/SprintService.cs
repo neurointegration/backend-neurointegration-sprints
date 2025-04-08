@@ -1,12 +1,6 @@
 ﻿using Data.Repositories;
 using Data;
 using Service.Dto;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace Service
 {
@@ -19,32 +13,36 @@ namespace Service
             _sprintRepository = sprintRepository;
         }
 
-        public async Task<SprintResponse> GetSprintByIdAsync(Guid userId, Guid sprintId)
+        public async Task<SprintResponse> GetSprintByIdAsync(long userId, long sprintNumber)
         {
-            var sprint = await _sprintRepository.GetSprintByIdAsync(sprintId);
+            var sprint = await _sprintRepository.GetSprintAsync(userId, sprintNumber);
 
-            if (sprint == null || sprint.UserId != userId)
+            if (sprint == null)
                 throw new UnauthorizedAccessException("Access denied to this sprint.");
 
             return MapToSprintResponse(sprint);
         }
 
-        public async Task<IList<SprintResponse>> GetSprintsByUserIdAsync(Guid userId)
+        public async Task<IList<SprintResponse>> GetSprintsByUserIdAsync(long userId)
         {
             var sprints = await _sprintRepository.GetSprintsByUserIdAsync(userId);
             return sprints.Select(MapToSprintResponse).ToList();
         }
 
-        public async Task CreateSprintAsync(Guid userId, CreateSprintRequest request)
+        public async Task CreateSprintAsync(long userId, CreateSprintRequest request)
         {
+            var sprints = await _sprintRepository.GetSprintsByUserIdAsync(userId);
+            var sprintNumber = 0L;
+            if (sprints.Count > 0)
+            {
+                sprintNumber = sprints[0].Number + 1;
+            }
             var sprint = new Sprint
             {
-                Id = Guid.NewGuid(),
+                Number = sprintNumber,
                 UserId = userId,
                 WeeksCount = request.WeeksCount,
-                BeginDate = request.BeginDate,
-                EndDate = request.EndDate,
-                Weeks = JsonSerializer.Serialize(request.Weeks)
+                BeginDate = request.BeginDate
             };
 
             await _sprintRepository.CreateSprintAsync(sprint);
@@ -52,15 +50,28 @@ namespace Service
 
         private SprintResponse MapToSprintResponse(Sprint sprint)
         {
-            var weeks = JsonSerializer.Deserialize<Dictionary<int, SprintWeekDto>>(sprint.Weeks);
-
+            var weeksCount = sprint.WeeksCount == 3 ? 3 : 4;
+            var weeks = new Dictionary<int, SprintWeek>();
+            for (var i = 0; i < weeksCount; i++)
+            {
+                weeks.Add(
+                    i + 1,
+                    new SprintWeek
+                    {
+                        Begin = sprint.BeginDate.AddDays(i * 7),
+                        End = sprint.BeginDate.AddDays(i * 7 + 6)
+                    }
+                );
+            }
             return new SprintResponse
             {
-                id = sprint.Id,
-                WeeksCount = sprint.WeeksCount,
+                id = sprint.Number,
+                Number = sprint.Number,
+                UserId = sprint.UserId,
+                WeeksCount = weeksCount,
                 BeginDate = sprint.BeginDate,
-                EndDate = sprint.EndDate,
-                Weeks = weeks ?? new Dictionary<int, SprintWeekDto>()
+                EndDate = sprint.BeginDate.AddDays(sprint.WeeksCount ?? 3 * 7 - 1),
+                Weeks = weeks
             };
         }
     }

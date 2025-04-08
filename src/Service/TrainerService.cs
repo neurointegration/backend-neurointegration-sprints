@@ -1,31 +1,28 @@
 ﻿using Data;
-using Microsoft.EntityFrameworkCore;
+using Data.Repositories;
 using Service.Dto;
 
 namespace Service
 {
     public class TrainerService : ITrainerService
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ITrainerRepository _trainerRepository;
 
-        public TrainerService(ApplicationDbContext context)
+        public TrainerService(ITrainerRepository trainerRepository)
         {
-            _context = context;
+            _trainerRepository = trainerRepository;
         }
 
-        public async Task<IList<ClientResponse>> GetClientsAsync(Guid userId)
+        public async Task<IList<ClientResponse>> GetClientsAsync(long userId)
         {
-            var clients = await _context.Users
-                .Where(u => u.TrainerId == userId)
-                .ToListAsync();
+            var clients = await _trainerRepository.GetClientsAsync(userId);
 
             return clients.Select(MapToClientResponse).ToList();
         }
 
-        public async Task<ClientResponse?> GetClientAsync(Guid trainerId, Guid clientId)
+        public async Task<ClientResponse?> GetClientAsync(long trainerId, long clientId)
         {
-            var client = await _context.Users
-                    .FirstOrDefaultAsync(u => u.Id == clientId && u.TrainerId == trainerId);
+            var client = await _trainerRepository.GetClientAsync(trainerId, clientId);
 
             if (client == null)
                 return null;
@@ -39,8 +36,7 @@ namespace Service
             {
                 Id = user.Id,
                 Username = user.UserName,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
+                FirstName = user.Name,
                 AboutMe = user.AboutMe,
                 PhotoUrl = user.PhotoUrl
             };

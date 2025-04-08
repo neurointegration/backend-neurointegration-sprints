@@ -1,14 +1,5 @@
-﻿using Data;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
+﻿using Data.Repositories;
 using Service.Dto;
-using Service.Exceptions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http.Json;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Service
 {
@@ -19,63 +10,23 @@ namespace Service
 
     public class UserManagementService : IUserManagementService
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IConfiguration _configuration;
+        private readonly ITrainerRepository _trainerRepository;
+        private readonly IUserRepository _userRepository;
 
-        public UserManagementService(UserManager<ApplicationUser> userManager, IConfiguration configuration)
+        public UserManagementService(ITrainerRepository trainerRepository, IUserRepository userRepository)
         {
-            _userManager = userManager;
-            _configuration = configuration;
+            _trainerRepository = trainerRepository;
+            _userRepository = userRepository;
         }
 
-        public async Task AssignTrainerAsync(Guid userId, string trainerUsername)
+        public Task AssignTrainerAsync(long userId, string trainerUsername)
         {
-            var trainer = await _userManager.FindByNameAsync(trainerUsername.Substring(1));
-            if (trainer == null)
-            {
-                throw new TrainerNotFoundException($"Trainer with username '{trainerUsername.Substring(1)}' is not registered.");
-            }
-
-            var botTrainersUrl = _configuration["BotIntegration:TrainersUrl"];
-            if (string.IsNullOrEmpty(botTrainersUrl))
-            {
-                throw new InvalidOperationException("BotIntegration:TrainersUrl is not configured.");
-            }
-
-            using var httpClient = new HttpClient();
-            var response = await httpClient.GetAsync(botTrainersUrl);
-
-            if (!response.IsSuccessStatusCode)
-            {
-                throw new Exception("Failed to fetch trainers from bot.");
-            }
-
-            var botTrainers = await response.Content.ReadFromJsonAsync<List<BotTrainerResponse>>();
-            if (botTrainers == null || !botTrainers.Any(bt => bt.Username == trainerUsername))
-            {
-                throw new TrainerNotInBotException($"Trainer with username '{trainerUsername}' is not listed in the bot.");
-            }
-
-            var user = await _userManager.FindByIdAsync(userId.ToString());
-            if (user == null)
-            {
-                throw new UserNotFoundException($"User with ID '{userId}' is not found.");
-            }
-
-            user.TrainerId = trainer.Id;
-            await _userManager.UpdateAsync(user);
+            throw new NotImplementedException("This method is outdated");
         }
 
-        public async Task<ClientResponse?> GetTrainerAsync(Guid userId)
+        public async Task<ClientResponse?> GetTrainerAsync(long userId)
         {
-            var user = await _userManager.FindByIdAsync(userId.ToString());
-            if (user == null)
-                throw new UserNotFoundException("User not found.");
-
-            if (user.TrainerId == null)
-                return null;
-
-            var trainer = await _userManager.FindByIdAsync(user.TrainerId.ToString()!);
+            var trainer = await _trainerRepository.GetTrainerAsync(userId);
             if (trainer == null)
                 return null;
 
@@ -83,54 +34,49 @@ namespace Service
             {
                 Id = trainer.Id,
                 Username = trainer.UserName,
-                FirstName = trainer.FirstName,
-                LastName = trainer.LastName,
+                FirstName = trainer.Name,
                 AboutMe = trainer.AboutMe,
                 PhotoUrl = trainer.PhotoUrl
             };
         }
 
-        public async Task<bool> AssignRolesAsync(Guid userId, RoleOption roleOption)
+        public async Task<bool> AssignRolesAsync(long userId, RoleOption roleOption)
         {
-            var user = await _userManager.FindByIdAsync(userId.ToString());
+            var user = await _userRepository.GetUserByIdAsync(userId);
             if (user == null)
                 return false;
 
-            var currentRoles = await _userManager.GetRolesAsync(user);
-            await _userManager.RemoveFromRolesAsync(user, currentRoles);
-
             if (roleOption == RoleOption.TrainerAndClient)
             {
-                await _userManager.AddToRoleAsync(user, "Client");
-                await _userManager.AddToRoleAsync(user, "Trainer");
+                user.IAmCoach = true;
             }
             else if (roleOption == RoleOption.ClientOnly)
             {
-                await _userManager.AddToRoleAsync(user, "Client");
+                user.IAmCoach = false;
             }
+            await _userRepository.UpsertAsync(user);
 
             return true;
         }
 
-        public async Task<bool> UpdateUserPropertiesAsync(Guid userId, UserUpdateRequest request)
+        public async Task<bool> UpdateUserPropertiesAsync(long userId, UserUpdateRequest request)
         {
-            var user = await _userManager.FindByIdAsync(userId.ToString());
+            var user = await _userRepository.GetUserByIdAsync(userId);
             if (user == null)
                 return false;
 
-            user.FirstName = request.FirstName ?? user.FirstName;
-            user.LastName = request.LastName ?? user.LastName;
+            user.Name = request.FirstName ?? user.Name;
             user.AboutMe = request.AboutMe ?? user.AboutMe;
             user.IsOnboardingComplete = request.IsOnboardingComplete ?? user.IsOnboardingComplete;
             user.SprintWeeksCount = request.SprintWeeksCount ?? user.SprintWeeksCount;
 
-            var result = await _userManager.UpdateAsync(user);
-            return result.Succeeded;
+            await _userRepository.UpsertAsync(user);
+            return true;
         }
 
-        public async Task<UserResponse?> GetUserByIdAsync(Guid userId)
+        public async Task<UserResponse?> GetUserByIdAsync(long userId)
         {
-            var user = await _userManager.FindByIdAsync(userId.ToString());
+            var user = await _userRepository.GetUserByIdAsync(userId);
 
             if (user == null)
                 return null;
@@ -138,8 +84,7 @@ namespace Service
             return new UserResponse
             {
                 Id = user.Id,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
+                FirstName = user.Name,
                 AboutMe = user.AboutMe,
                 PhotoUrl = user.PhotoUrl,
                 IsOnboardingComplete = user.IsOnboardingComplete,
@@ -147,9 +92,16 @@ namespace Service
             };
         }
 
-        public async Task<IList<String>> GetUserRolesAsync(Guid userId)
+        public async Task<IList<String>> GetUserRolesAsync(long userId)
         {
-            var roles = await _userManager.GetRolesAsync(new ApplicationUser { Id = userId });
+            var user = await _userRepository.GetUserByIdAsync(userId);
+            var roles = new List<string>();
+            roles.Add("Client");
+            if (user != null && user.IAmCoach == true)
+            {
+                roles.Add("Trainer");
+            }
+
             return roles;
         }
     }

@@ -27,23 +27,24 @@ namespace Service
             return MapToProjectResponse(project);
         }
 
-        public async Task<IList<ProjectResponse>> GetProjectsBySprintIdAsync(Guid sprintId)
+        public async Task<IList<ProjectResponse>> GetProjectsBySprintAsync(long userId, long sprintNumber)
         {
-            var projects = await _projectRepository.GetProjectsBySprintIdAsync(sprintId);
+            var projects = await _projectRepository.GetProjectsBySprintAsync(userId, sprintNumber);
 
             return projects.Select(MapToProjectResponse).ToList();
         }
 
-        public async Task<ProjectResponse> CreateProjectAsync(CreateProjectRequest request)
+        public async Task<ProjectResponse> CreateProjectAsync(long userId, CreateProjectRequest request)
         {
             var project = new Project
             {
                 Id = Guid.NewGuid(),
-                SprintId = request.SprintId,
+                SprintNumber = request.SprintNumber != 0 ? request.SprintNumber : request.SprintId,
+                UserId = userId,
                 Title = request.Title,
                 SectionName = request.SectionName,
-                PlanningTimes = ConvertDictionaryToJson(request.PlanningTimes),
-                FactTimes = ConvertDictionaryToJson(request.FactTimes)
+                PlanningTimes = request.PlanningTimes,
+                FactTimes = request.FactTimes
             };
 
             var createdProject = await _projectRepository.CreateProjectAsync(project);
@@ -58,8 +59,8 @@ namespace Service
 
             existingProject.Title = request.Title ?? existingProject.Title;
             existingProject.SectionName = request.SectionName ?? existingProject.SectionName;
-            existingProject.PlanningTimes = ConvertDictionaryToJson(request.PlanningTimes) ?? existingProject.PlanningTimes;
-            existingProject.FactTimes = ConvertDictionaryToJson(request.FactTimes) ?? existingProject.FactTimes;
+            existingProject.PlanningTimes = request.PlanningTimes ?? existingProject.PlanningTimes;
+            existingProject.FactTimes = request.FactTimes ?? existingProject.FactTimes;
 
             var updatedProject = await _projectRepository.UpdateProjectAsync(existingProject);
 
@@ -73,8 +74,8 @@ namespace Service
                 Id = project.Id,
                 Title = project.Title,
                 SectionName = project.SectionName,
-                PlanningTimes = ConvertJsonToDictionary<PlanningTimeDto>(project.PlanningTimes),
-                FactTimes = ConvertJsonToDictionary<FactTimeDto>(project.FactTimes)
+                PlanningTimes = project.PlanningTimes,
+                FactTimes = project.FactTimes
             };
         }
 

@@ -1,45 +1,126 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Dapper;
+using System.Data;
+using System.Text.Json;
 
 namespace Data.Repositories
 {
     public class ProjectRepository : IProjectRepository
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IDbConnection _con;
+        private readonly string _projectsTable = "projects";
 
-        public ProjectRepository(ApplicationDbContext context)
+        public ProjectRepository(IDbConnection con)
         {
-            _context = context;
+            _con = con;
         }
 
         public async Task<Project?> GetProjectByIdAsync(Guid projectId)
         {
-            return await _context.Projects
-                .FirstOrDefaultAsync(p => p.Id == projectId);
+            var sql = $@"
+SELECT 
+    project_id AS {nameof(Project.Id)},
+    chat_id AS {nameof(Project.UserId)},
+    sprint_number AS {nameof(Project.SprintNumber)},
+    section_name AS {nameof(Project.SectionName)},
+    title AS {nameof(Project.Title)},
+    planning_times AS {nameof(Project.PlanningTimes)},
+    fact_times AS {nameof(Project.FactTimes)}
+FROM {_projectsTable}
+WHERE project_id = @ProjectId";
+
+            return await _con.QueryFirstOrDefaultAsync<Project>(sql, new { ProjectId = projectId });
         }
 
-        public async Task<IList<Project>> GetProjectsBySprintIdAsync(Guid sprintId)
+        public async Task<IList<Project>> GetProjectsBySprintAsync(long userId, long sprintNumber)
         {
-            return await _context.Projects
-                .Where(p => p.SprintId == sprintId)
-                .ToListAsync();
+            var sql = $@"
+SELECT 
+    project_id AS {nameof(Project.Id)},
+    chat_id AS {nameof(Project.UserId)},
+    sprint_number AS {nameof(Project.SprintNumber)},
+    section_name AS {nameof(Project.SectionName)},
+    title AS {nameof(Project.Title)},
+    planning_times AS {nameof(Project.PlanningTimes)},
+    fact_times AS {nameof(Project.FactTimes)}
+FROM {_projectsTable}
+WHERE chat_id = @UserId AND sprint_number = @SprintNumber";
+
+            var projects = await _con.QueryAsync<Project>(sql, new { UserId = userId, SprintNumber = sprintNumber });
+            return projects.ToList();
         }
 
         public async Task<Project> CreateProjectAsync(Project project)
         {
-            await _context.Projects.AddAsync(project);
-            await _context.SaveChangesAsync();
+            var sql = $@"
+UPSERT INTO {_projectsTable}
+(
+    project_id,
+    chat_id,
+    sprint_number,
+    section_name,
+    title,
+    planning_times,
+    fact_times
+)
+VALUES
+(
+    @Id,
+    @UserId,
+    @SprintNumber,
+    @SectionName,
+    @Title,
+    @PlanningTimes,
+    @FactTimes
+)";
+
+            await _con.ExecuteAsync(sql,
+                new
+                {
+                    Id = project.Id,
+                    UserId = project.UserId,
+                    SprintNumber = project.SprintNumber,
+                    SectionName = project.SectionName.ToString(),
+                    Title = project.Title,
+                    PlanningTimes = JsonSerializer.Serialize(project.PlanningTimes),
+                    FactTimes = JsonSerializer.Serialize(project.FactTimes)
+                });
             return project;
         }
 
         public async Task<Project> UpdateProjectAsync(Project project)
         {
-            _context.Projects.Update(project);
-            await _context.SaveChangesAsync();
+            var sql = $@"
+UPSERT INTO {_projectsTable}
+(
+    project_id,
+    chat_id,
+    sprint_number,
+    section_name,
+    title,
+    planning_times,
+    fact_times
+)
+VALUES
+(
+    @Id,
+    @UserId,
+    @SprintNumber,
+    @SectionName,
+    @Title,
+    @PlanningTimes,
+    @FactTimes
+)";
+            await _con.ExecuteAsync(sql,
+                new
+                {
+                    Id = project.Id,
+                    UserId = project.UserId,
+                    SprintNumber = project.SprintNumber,
+                    SectionName = project.SectionName.ToString(),
+                    Title = project.Title,
+                    PlanningTimes = JsonSerializer.Serialize(project.PlanningTimes),
+                    FactTimes = JsonSerializer.Serialize(project.FactTimes)
+                });
             return project;
         }
     }

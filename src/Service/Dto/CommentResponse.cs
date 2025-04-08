@@ -8,7 +8,7 @@ namespace Service.Dto
 {
     public class CommentResponse
     {
-        public Guid UserId { get; set; }
+        public long UserId { get; set; }
         public string CommentText { get; set; } = string.Empty;
     }
 }

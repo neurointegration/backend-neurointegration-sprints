@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Service.Dto;
 using Service;
+using Api.Extensions;
 
 namespace Api.Controllers
 {
@@ -27,17 +28,19 @@ namespace Api.Controllers
             return Ok(project);
         }
 
-        [HttpGet("sprint/{sprintId}")]
-        public async Task<ActionResult<IList<ProjectResponse>>> GetProjectsBySprintId(Guid sprintId)
+        [HttpGet("sprint/{sprintNumber}")]
+        public async Task<ActionResult<IList<ProjectResponse>>> GetProjectsBySprintId(long sprintNumber)
         {
-            var projects = await _projectService.GetProjectsBySprintIdAsync(sprintId);
+            var userId = User.GetUserId();
+            var projects = await _projectService.GetProjectsBySprintAsync(userId, sprintNumber);
             return Ok(projects);
         }
 
         [HttpPost]
         public async Task<ActionResult<ProjectResponse>> CreateProject([FromBody] CreateProjectRequest request)
         {
-            var result = await _projectService.CreateProjectAsync(request);
+            var userId = User.GetUserId();
+            var result = await _projectService.CreateProjectAsync(userId, request);
             return Ok(result);
         }
 

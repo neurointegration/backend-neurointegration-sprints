@@ -19,7 +19,7 @@ namespace Api.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<CommentResponse>> GetComment(Guid userId)
+        public async Task<ActionResult<CommentResponse>> GetComment(long userId)
         {
             var trainerId = User.GetUserId();
 
@@ -33,7 +33,7 @@ namespace Api.Controllers
 
         [HttpPost]
         public async Task<ActionResult<CommentResponse>> CreateOrUpdateComment(
-            Guid userId,
+            long userId,
             [FromBody] UpdateCommentRequest request)
         {
             var trainerId = User.GetUserId();

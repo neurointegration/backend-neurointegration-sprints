@@ -18,14 +18,14 @@ namespace Api.Controllers
             _sprintService = sprintService;
         }
 
-        [HttpGet("{sprintId}")]
-        public async Task<ActionResult<SprintResponse>> GetSprintById(Guid sprintId)
+        [HttpGet("{sprintNumber}")]
+        public async Task<ActionResult<SprintResponse>> GetSprintById(long sprintNumber)
         {
             var userId = User.GetUserId();
 
             try
             {
-                var sprint = await _sprintService.GetSprintByIdAsync(userId, sprintId);
+                var sprint = await _sprintService.GetSprintByIdAsync(userId, sprintNumber);
                 return Ok(sprint);
             }
             catch (UnauthorizedAccessException)

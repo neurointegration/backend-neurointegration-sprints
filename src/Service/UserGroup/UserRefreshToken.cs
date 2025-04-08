@@ -1,4 +1,7 @@
-﻿namespace Service.UserGroup
+﻿using System.Security.Cryptography;
+using System.Text;
+
+namespace Service.UserGroup
 {
     public class UserRefreshTokenRequest
     {
@@ -15,20 +18,29 @@
         public async Task<AppResponse<UserRefreshTokenResponse>> UserRefreshTokenAsync(UserRefreshTokenRequest request)
         {
             var principal = TokenUtil.GetPrincipalFromExpiredToken(_tokenSettings, request.AccessToken);
-            if (principal == null || principal.FindFirst("UserName")?.Value == null)
+            if (principal == null)
             {
-                return new AppResponse<UserRefreshTokenResponse>().SetErrorResponse("email", "User not found");
+                return new AppResponse<UserRefreshTokenResponse>().SetErrorResponse("id", "User not found");
+            }
+
+            var userId = principal.FindFirst("Id")?.Value;
+            if (userId == null)
+            {
+                return new AppResponse<UserRefreshTokenResponse>().SetErrorResponse("id", "User not found");
             }
             else
             {
-                var user = await _userManager.FindByNameAsync(principal.FindFirst("UserName")?.Value ?? "");
+                var user = await userRepository.GetUserByIdAsync(long.Parse(userId));
                 if (user == null)
                 {
-                    return new AppResponse<UserRefreshTokenResponse>().SetErrorResponse("email", "User not found");
+                    return new AppResponse<UserRefreshTokenResponse>().SetErrorResponse("id", "User not found");
                 }
                 else
                 {
-                    if (!await _userManager.VerifyUserTokenAsync(user, "REFRESHTOKENPROVIDER", "RefreshToken", request.RefreshToken))
+                    using var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(_tokenSettings.SecretKey));
+                    var hashBytes = hmac.ComputeHash(Encoding.UTF8.GetBytes(request.RefreshToken));
+                    var tokenHash = Convert.ToHexString(hashBytes);
+                    if (!await refreshTokenRepository.IsOkAsync(tokenHash, long.Parse(userId)))
                     {
                         return new AppResponse<UserRefreshTokenResponse>().SetErrorResponse("token", "Refresh token expired");
                     }

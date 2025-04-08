@@ -9,8 +9,8 @@ namespace Service
 {
     public interface ISprintService
     {
-        Task<SprintResponse> GetSprintByIdAsync(Guid userId, Guid sprintId);
-        Task<IList<SprintResponse>> GetSprintsByUserIdAsync(Guid userId);
-        Task CreateSprintAsync(Guid userId, CreateSprintRequest request);
+        Task<SprintResponse> GetSprintByIdAsync(long userId, long sprintNumber);
+        Task<IList<SprintResponse>> GetSprintsByUserIdAsync(long userId);
+        Task CreateSprintAsync(long userId, CreateSprintRequest request);
     }
 }

@@ -1,31 +1,17 @@
-﻿using Microsoft.AspNetCore.Identity;
-
-namespace Data
+﻿namespace Data
 {
-    public class ApplicationUser : IdentityUser<Guid>
+    public class ApplicationUser
     {
-        public ApplicationUser()
-        {
-            Id = Guid.NewGuid();
-            SecurityStamp = Guid.NewGuid().ToString();
-        }
-
-        public ApplicationUser(string userName) : this()
-        {
-            UserName = userName;
-        }
-
-        public string? FirstName { get; set; }
+        public long Id { get; set; }
+        public string? Email { get; set; }
+        public string? UserName { get; set; }
+        public bool IAmCoach { get; set; }
+        public bool SendRegularMessages { get; set; }
+        public string? Name { get; set; }
         public bool IsOnboardingComplete { get; set; }
-        public string? LastName { get; set; }
         public string? AboutMe { get; set; }
         public int SprintWeeksCount { get; set; }
-        public string? TelegramId { get; set; }
         public string? PhotoUrl { get; set; }
-
-        public Guid? TrainerId { get; set; }
-        public ApplicationUser? Trainer { get; set; }
-
-        public IList<ApplicationUser> Clients { get; set; } = default!;
+        public string? PasswordHash { get; set; }
     }
 }

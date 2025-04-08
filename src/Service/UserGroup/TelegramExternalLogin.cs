@@ -1,8 +1,5 @@
-﻿using System.Security.Claims;
-using System.Text;
+﻿using System.Text;
 using System.Security.Cryptography;
-using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Identity;
 using System.Data;
 using Data;
 using Microsoft.Extensions.Logging;
@@ -33,26 +30,22 @@ namespace Service.UserGroup
             {
                 return new AppResponse<UserLoginResponse>().SetErrorResponse("Time", "Data is outdated");
             }
-            var info = new UserLoginInfo("Telegram", loginRequest.Id, "Telegram");
-            var telegramUser = await _userManager.FindByLoginAsync(info.LoginProvider, info.ProviderKey);
+            var telegramUser = await userRepository.GetUserByIdAsync(long.Parse(loginRequest.Id));
             if (telegramUser == null)
             {
                 telegramUser = new ApplicationUser
                 {
-                    FirstName = loginRequest.FirstName,
-                    LastName = loginRequest.LastName,
+                    Id = long.Parse(loginRequest.Id),
+                    Name = loginRequest.FirstName,
                     UserName = loginRequest.UserName,
-                    TelegramId = loginRequest.Id,
                     PhotoUrl = loginRequest.PhotoUrl
                 };
-                await _userManager.CreateAsync(telegramUser);
-                await _userManager.AddLoginAsync(telegramUser, info);
             }
             else
             {
-                await _userManager.AddLoginAsync(telegramUser, info);
+                telegramUser.UserName = loginRequest.UserName;
             }
-            _ = Task.Run(() => _backgroundSprintsUpdateService.UpdateSprintForUserAsync(telegramUser));
+            await userRepository.UpsertAsync(telegramUser);
             var token = await GenerateUserToken(telegramUser);
             return new AppResponse<UserLoginResponse>().SetSuccessResponse(token);
         }

@@ -1,41 +1,67 @@
 using AspNetCore.Yandex.ObjectStorage.Extensions;
+using Dapper;
 using Data;
+using Data.DapperHandlers;
 using Data.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Service;
 using Service.UserGroup;
+using System.Data;
 using System.Text;
+using Ydb.Sdk.Ado;
+using Ydb.Sdk.Auth;
+using Ydb.Sdk.Yc;
 
 namespace Api
 {
     public class Program
     {
-            public static async Task Main(string[] args)
+        public static void Main(string[] args)
         {
-
             var builder = WebApplication.CreateBuilder(args);
-            var connectionStr = builder.Configuration.GetConnectionString("DefaultConnection");
+
+            var port = Environment.GetEnvironmentVariable("PORT");
+            if (!string.IsNullOrEmpty(port))
+            {
+                builder.WebHost.UseUrls($"http://*:{port}");
+            }
+
             var appSettings = builder.Configuration.GetSection("TokenSettings").Get<TokenSettings>() ?? default!;
             builder.Services.AddSingleton(appSettings);
 
-            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-            builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                            options.UseNpgsql(connectionString));
-
-            builder.Services.AddIdentityCore<ApplicationUser>()
-                .AddRoles<Role>()
-                .AddSignInManager()
-                .AddEntityFrameworkStores<ApplicationDbContext>()
-                .AddTokenProvider<DataProtectorTokenProvider<ApplicationUser>>("REFRESHTOKENPROVIDER");
-
-            builder.Services.Configure<DataProtectionTokenProviderOptions>(options =>
+            var loggerFactory = LoggerFactory.Create(loggingBuilder =>
             {
-                options.TokenLifespan = TimeSpan.FromSeconds(appSettings.RefreshTokenExpireSeconds);
+                loggingBuilder.AddConsole();
             });
+
+            var saFilePath = builder.Configuration["YDB:SaFilePath"];
+            ICredentialsProvider credentialsProvider;
+            if (saFilePath != null)
+                credentialsProvider = new ServiceAccountProvider(saFilePath, loggerFactory);
+            else
+                credentialsProvider = new MetadataProvider(loggerFactory);
+
+            var ydbConnectionBuilder = new YdbConnectionStringBuilder
+            {
+                Host = builder.Configuration["YDB:Host"] ?? throw new InvalidOperationException("Env  'YDB:Host' not found."),
+                Port = int.Parse(builder.Configuration["YDB:Port"] ?? throw new InvalidOperationException("Env  'YDB:Port' not found.")),
+                Database = builder.Configuration["YDB:Database"] ?? throw new InvalidOperationException("Env  'YDB:Database' not found."),
+                LoggerFactory = loggerFactory,
+                CredentialsProvider = credentialsProvider,
+                UseTls = true
+            };
+
+            builder.Services.AddTransient<IDbConnection>(sp =>
+            {
+                return new YdbConnection(ydbConnectionBuilder);
+            });
+
+            SqlMapper.AddTypeMap(typeof(DateTime), DbType.DateTime);
+            SqlMapper.AddTypeHandler(new SqlDateOnlyTypeHandler());
+            SqlMapper.AddTypeHandler(new SqlDictionaryTypeHandler<string, PlanningTime>());
+            SqlMapper.AddTypeHandler(new SqlDictionaryTypeHandler<string, FactTime>());
 
             builder.Services.AddAuthentication(options =>
             {
@@ -58,8 +84,9 @@ namespace Api
                     };
                 });
 
-            builder.Services.AddScoped<ApplicationDbContextInitialiser>();
-
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
+            builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+            builder.Services.AddScoped<ITrainerRepository, TrainerRepository>();
             builder.Services.AddScoped<ISprintRepository, SprintRepository>();
             builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
             builder.Services.AddScoped<ITaskRepository, TaskRepository>();
@@ -71,12 +98,6 @@ namespace Api
             builder.Services.AddScoped<ITrainerCommentService, TrainerCommentService>();
             builder.Services.AddScoped<ITrainerService, TrainerService>();
             builder.Services.AddTransient<UserService>();
-
-            builder.Services.AddSingleton<BackgroundSprintsUpdateService>();
-            builder.Services.AddHostedService(provider => provider.GetRequiredService<BackgroundSprintsUpdateService>());
-            builder.Services.AddHostedService<BackgroundSprintsUpdateService>();
-            builder.Services.AddHttpClient<SprintUpdaterService>();
-            builder.Services.AddScoped<ISprintUpdaterService, SprintUpdaterService>();
 
             builder.Services.AddYandexObjectStorage(builder.Configuration);
             builder.Services.AddScoped<AvatarService>();
@@ -97,7 +118,7 @@ namespace Api
 
             builder.Services.AddSwaggerGen(config =>
             {
-                config.SwaggerDoc("v1", new OpenApiInfo() { Title = "App Api", Version = "v1" });
+                config.SwaggerDoc("v1", new OpenApiInfo() { Title = "App Api", Version = "1.0.0" });
                 config.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
                     In = ParameterLocation.Header,
@@ -128,10 +149,6 @@ namespace Api
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
-                using var scope = app.Services.CreateScope();
-                var initialiser = scope.ServiceProvider.GetRequiredService<ApplicationDbContextInitialiser>();
-                await initialiser.InitialiseAsync();
-                await initialiser.SeedAsync();
             }
             app.UseCors("webAppRequests");
             app.UseAuthentication();

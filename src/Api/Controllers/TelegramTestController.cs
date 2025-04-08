@@ -18,7 +18,7 @@ namespace Api.Controllers
     <title>Telegram Login</title>
 </head>
 <body>
-<script async src=""https://telegram.org/js/telegram-widget.js?22"" data-telegram-login=""neurosprints_test_bot"" data-size=""large"" data-onauth=""onTelegramAuth(user)""></script>
+<script async src=""https://telegram.org/js/telegram-widget.js?22"" data-telegram-login=""neurosprints_test3_bot"" data-size=""large"" data-onauth=""onTelegramAuth(user)""></script>
 <script type=""text/javascript"">
   async function onTelegramAuth(user) {
     try {

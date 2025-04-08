@@ -1,59 +1,37 @@
 ﻿using Data;
-using Microsoft.EntityFrameworkCore;
+using Data.Repositories;
 using Service.Dto;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Service
 {
     public class TrainerCommentService : ITrainerCommentService
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ITrainerRepository _trainerRepository;
 
-        public TrainerCommentService(ApplicationDbContext context)
+        public TrainerCommentService(ITrainerRepository trainerRepository)
         {
-            _context = context;
+            _trainerRepository = trainerRepository;
         }
 
-        public async Task<CommentResponse?> GetCommentAsync(Guid trainerId, Guid clientId)
+        public async Task<CommentResponse?> GetCommentAsync(long trainerId, long clientId)
         {
-            var comment = await _context.TrainerComments
-                .AsNoTracking()
-                .FirstOrDefaultAsync(tc => tc.TrainerId == trainerId && tc.ClientId == clientId);
-
+            var comment = await _trainerRepository.GetCommentAsync(trainerId, clientId);
             return comment == null ? null : new CommentResponse
             {
                 UserId = comment.ClientId,
-                CommentText = comment.CommentText
+                CommentText = comment.CommentText ?? string.Empty
             };
         }
 
-        public async Task<CommentResponse> CreateOrUpdateCommentAsync(Guid trainerId, UpdateCommentRequest request)
+        public async Task<CommentResponse> CreateOrUpdateCommentAsync(long trainerId, UpdateCommentRequest request)
         {
-            var comment = await _context.TrainerComments
-                .FirstOrDefaultAsync(tc => tc.TrainerId == trainerId && tc.ClientId == request.UserId);
-
-            if (comment == null)
+            var comment = new TrainerComment
             {
-                comment = new TrainerComment
-                {
-                    Id = Guid.NewGuid(),
-                    TrainerId = trainerId,
-                    ClientId = request.UserId,
-                    CommentText = request.CommentText
-                };
-                _context.TrainerComments.Add(comment);
-            }
-            else
-            {
-                comment.CommentText = request.CommentText;
-                _context.TrainerComments.Update(comment);
-            }
-
-            await _context.SaveChangesAsync();
+                TrainerId = trainerId,
+                ClientId = request.UserId,
+                CommentText = request.CommentText
+            };
+            await _trainerRepository.UpdateCommentAsync(comment);
 
             return new CommentResponse
             {
