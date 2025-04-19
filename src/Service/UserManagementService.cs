@@ -68,6 +68,7 @@ namespace Service
             user.Name = request.FirstName ?? user.Name;
             user.AboutMe = request.AboutMe ?? user.AboutMe;
             user.IsOnboardingComplete = request.IsOnboardingComplete ?? user.IsOnboardingComplete;
+            user.Onboarding = request.Onboarding ?? user.Onboarding;
             user.SprintWeeksCount = request.SprintWeeksCount ?? user.SprintWeeksCount;
 
             await _userRepository.UpsertAsync(user);
@@ -88,6 +89,7 @@ namespace Service
                 AboutMe = user.AboutMe,
                 PhotoUrl = user.PhotoUrl,
                 IsOnboardingComplete = user.IsOnboardingComplete,
+                Onboarding = user.Onboarding,
                 SprintWeeksCount = user.SprintWeeksCount
             };
         }

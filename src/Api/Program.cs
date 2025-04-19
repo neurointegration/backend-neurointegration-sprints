@@ -62,6 +62,7 @@ namespace Api
             SqlMapper.AddTypeHandler(new SqlDateOnlyTypeHandler());
             SqlMapper.AddTypeHandler(new SqlDictionaryTypeHandler<string, PlanningTime>());
             SqlMapper.AddTypeHandler(new SqlDictionaryTypeHandler<string, FactTime>());
+            SqlMapper.AddTypeHandler(new SqlDictionaryTypeHandler<string, bool>());
 
             builder.Services.AddAuthentication(options =>
             {

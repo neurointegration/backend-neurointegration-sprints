@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Service.Dto
+﻿namespace Service.Dto
 {
     public class UserResponse
     {
@@ -13,6 +7,7 @@ namespace Service.Dto
         public string? AboutMe { get; set; }
         public string? PhotoUrl { get; set; }
         public bool IsOnboardingComplete { get; set; }
+        public Dictionary<string, bool>? Onboarding { get; set; } = default!;
         public int SprintWeeksCount { get; set; }
     }
 }

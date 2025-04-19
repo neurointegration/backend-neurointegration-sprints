@@ -9,6 +9,7 @@
         public bool SendRegularMessages { get; set; }
         public string? Name { get; set; }
         public bool IsOnboardingComplete { get; set; }
+        public Dictionary<string, bool>? Onboarding { get; set; } = default!;
         public string? AboutMe { get; set; }
         public int SprintWeeksCount { get; set; }
         public string? PhotoUrl { get; set; }

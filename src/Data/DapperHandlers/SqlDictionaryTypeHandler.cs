@@ -19,6 +19,7 @@ namespace Data.DapperHandlers
         // А этот метод работает нормально
         public override Dictionary<TKey, TVal>? Parse(object value)
         {
+            if ((string)value == "Null") return null;
             return JsonSerializer.Deserialize<Dictionary<TKey, TVal>?>((string)value);
         }
     }

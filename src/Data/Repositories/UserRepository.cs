@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using System.Data;
+using System.Text.Json;
 
 namespace Data.Repositories
 {
@@ -22,6 +23,7 @@ SELECT chat_id AS {nameof(ApplicationUser.Id)},
     send_regular_messages AS {nameof(ApplicationUser.SendRegularMessages)},
     name AS {nameof(ApplicationUser.Name)},
     is_onboarding_complete AS {nameof(ApplicationUser.IsOnboardingComplete)},
+    onboarding AS {nameof(ApplicationUser.Onboarding)},
     about_me AS {nameof(ApplicationUser.AboutMe)},
     sprint_weeks_count AS {nameof(ApplicationUser.SprintWeeksCount)},
     photo_url AS {nameof(ApplicationUser.PhotoUrl)},
@@ -46,6 +48,7 @@ SELECT chat_id AS {nameof(ApplicationUser.Id)},
     send_regular_messages AS {nameof(ApplicationUser.SendRegularMessages)},
     name AS {nameof(ApplicationUser.Name)},
     is_onboarding_complete AS {nameof(ApplicationUser.IsOnboardingComplete)},
+    onboarding AS {nameof(ApplicationUser.Onboarding)},
     about_me AS {nameof(ApplicationUser.AboutMe)},
     sprint_weeks_count AS {nameof(ApplicationUser.SprintWeeksCount)},
     photo_url AS {nameof(ApplicationUser.PhotoUrl)},
@@ -72,6 +75,7 @@ UPSERT INTO {_usersTable}
     send_regular_messages,
     name,
     is_onboarding_complete,
+    onboarding,
     about_me,
     sprint_weeks_count,
     photo_url,
@@ -86,12 +90,28 @@ VALUES
     @SendRegularMessages,
     @Name,
     @IsOnboardingComplete,
+    @Onboarding,
     @AboutMe,
     @SprintWeeksCount,
     @PhotoUrl,
     @PasswordHash
 )";
-            await _con.ExecuteAsync(sql, user);
+            await _con.ExecuteAsync(sql,
+                new
+                {
+                    Id = user.Id,
+                    Email = user.Email,
+                    UserName = user.UserName,
+                    IAmCoach = user.IAmCoach,
+                    SendRegularMessages = user.SendRegularMessages,
+                    Name = user.Name,
+                    IsOnboardingComplete = user.IsOnboardingComplete,
+                    Onboarding = JsonSerializer.Serialize(user.Onboarding),
+                    AboutMe = user.AboutMe,
+                    SprintWeeksCount = user.SprintWeeksCount,
+                    PhotoUrl = user.PhotoUrl,
+PasswordHash = user.PasswordHash
+                });
             return user;
         }
     }
