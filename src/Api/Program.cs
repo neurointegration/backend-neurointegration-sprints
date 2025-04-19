@@ -120,6 +120,7 @@ namespace Api
             builder.Services.AddScoped<ISprintRepository, SprintRepository>();
             builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
             builder.Services.AddScoped<ITaskRepository, TaskRepository>();
+            builder.Services.AddScoped<ISprintAnswerRepository, SprintAnswerRepository>();
 
             builder.Services.AddScoped<IUserManagementService, UserManagementService>();
             builder.Services.AddScoped<ISprintService, SprintService>();
@@ -127,6 +128,7 @@ namespace Api
             builder.Services.AddScoped<ITaskService, TaskService>();
             builder.Services.AddScoped<ITrainerCommentService, TrainerCommentService>();
             builder.Services.AddScoped<ITrainerService, TrainerService>();
+            builder.Services.AddScoped<ISprintAnswerService, SprintAnswerService>();
             builder.Services.AddTransient<UserService>();
 
             builder.Services.AddYandexObjectStorage(builder.Configuration);
