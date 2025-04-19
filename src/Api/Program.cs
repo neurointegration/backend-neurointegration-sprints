@@ -82,6 +82,36 @@ namespace Api
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(appSettings.SecretKey)),
                         ClockSkew = TimeSpan.FromSeconds(0)
                     };
+
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnMessageReceived = context =>
+                        {
+                            string? token = null;
+                            if (context.Request.Headers.TryGetValue("Authorization", out var authHeaders))
+                            {
+                                var auth = authHeaders.FirstOrDefault();
+                                if (!string.IsNullOrEmpty(auth) && auth.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    token = auth.Substring("Bearer ".Length).Trim();
+                                }
+                            }
+                            if (token == null &&
+                                context.Request.Headers.TryGetValue("Auth-Token", out var customHeaders))
+                            {
+                                var auth = customHeaders.FirstOrDefault();
+                                if (!string.IsNullOrEmpty(auth))
+                                {
+                                    auth.Substring("Bearer ".Length).Trim();
+                                }
+                            }
+                            if (!string.IsNullOrEmpty(token))
+                            {
+                                context.Token = token;
+                            }
+                            return Task.CompletedTask;
+                        }
+                    };
                 });
 
             builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -156,5 +186,5 @@ namespace Api
             app.MapControllers();
             app.Run();
         }
-    }
+   }
 }
