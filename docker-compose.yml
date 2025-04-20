@@ -1,17 +1,4 @@
 services:
-  db:
-    image: postgres
-    container_name: neurosprints_db
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: testuser
-      POSTGRES_PASSWORD: testpassword
-      POSTGRES_DB: neurosprints
-    ports:
-      - "5433:5432"
-    volumes:
-      - db_data:/var/lib/postgresql/data
-
   api:
     build:
       context: .
@@ -20,18 +7,16 @@ services:
     restart: unless-stopped
     environment:
       ASPNETCORE_ENVIRONMENT: Development
-      ConnectionStrings__DefaultConnection: Host=db;Port=5432;Database=neurosprints;Username=testuser;Password=testpassword
       Telegram__BotToken: ${Telegram__BotToken}
-      BotIntegration__TrainersUrl: ${BotIntegration__TrainersUrl}
-      BotIntegration__SprintsUrl: ${BotIntegration__SprintsUrl}
-      BotIntegration__SprintsUpdateTimeInMinutes: ${BotIntegration__SprintsUpdateTimeInMinutes}
       TokenSettings__Audience: ${TokenSettings__Audience}
       YandexObjectStorage__AccessKey: ${YandexObjectStorage__AccessKey}
       YandexObjectStorage__SecretKey: ${YandexObjectStorage__SecretKey}
+      YDB__SaFilePath: /app/neurosprints-developer.sa
+      YDB__Host: ${YDB__Host}
+      YDB__Port: ${YDB__Port}
+      YDB__Database: ${YDB__Database}
+
     ports:
       - "80:8080"
-    depends_on:
-      - db
-
-volumes:
-  db_data:
+    volumes:                                                                                                            
+      - ./neurosprints-developer.sa:/app/neurosprints-developer.sa:ro

@@ -399,3 +399,4 @@ FodyWeavers.xsd
 /src/Web/package-lock.json
 
 .env
+*.sa
