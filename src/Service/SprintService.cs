@@ -70,7 +70,7 @@ namespace Service
                 UserId = sprint.UserId,
                 WeeksCount = weeksCount,
                 BeginDate = sprint.BeginDate,
-                EndDate = sprint.BeginDate.AddDays(sprint.WeeksCount ?? 3 * 7 - 1),
+                EndDate = sprint.BeginDate.AddDays(weeksCount * 7 - 1),
                 Weeks = weeks
             };
         }
