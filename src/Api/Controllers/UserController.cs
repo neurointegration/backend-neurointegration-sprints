@@ -6,7 +6,7 @@ using Service.UserGroup;
 namespace Api.Controllers
 {
     [ApiController]
-    [Route("[controller]/[action]")]
+    [Route("api/[controller]/[action]")]
     public class UserController(UserService userService) : ControllerBase
     {
         private readonly UserService _userService = userService;
