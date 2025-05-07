@@ -8,6 +8,8 @@ namespace Data.Repositories
         private readonly IDbConnection _con;
         private readonly string _usersInfoTable = "users_info";
         private readonly string _usersAccessTable = "users_access";
+        private readonly string _projectsTable = "projects";
+        private readonly string _tasksTable = "tasks";
 
         public TrainerRepository(IDbConnection con)
         {
@@ -102,6 +104,58 @@ WHERE ua.owner_user_id = @ClientId";
                 sql,
                 new { ClientId = clientId });
             return trainer;
+        }
+
+        public async Task<bool> HasAccessAsync(long treinerId, long clientId)
+        {
+            var sql = $@"
+SELECT COUNT(1)
+FROM {_usersAccessTable}
+WHERE granted_user_id = @treinerId
+    AND owner_user_id = @clientId";
+
+            var count = await _con.ExecuteScalarAsync<int>(sql, new { clientId, treinerId});
+            return count > 0;
+        }
+
+        public async Task<bool> HasProjectAccessAsync(long trainerId, long clientId, Guid clientProjectId)
+        {
+            var sql = $@"
+SELECT COUNT(1)
+FROM {_projectsTable} p
+JOIN {_usersAccessTable} ua
+    ON p.chat_id = ua.owner_user_id
+WHERE p.project_id = @ProjectId
+    AND ua.owner_user_id = @ClientId
+    AND ua.granted_user_id = @TrainerId";
+
+            var count = await _con.ExecuteScalarAsync<int>(
+                sql,
+                new { TrainerId = trainerId, ClientId = clientId, ProjectId = clientProjectId }
+            );
+
+            return count > 0;
+        }
+
+        public async Task<bool> HasTaskAccessAsync(long trainerId, long clientId, Guid clientTaskId)
+        {
+            var sql = $@"
+SELECT COUNT(1)
+FROM {_tasksTable} t
+JOIN {_projectsTable} p
+    ON t.project_id = p.project_id
+JOIN {_usersAccessTable} ua
+    ON p.chat_id = ua.owner_user_id
+WHERE t.task_id = @TaskId
+    AND ua.owner_user_id = @ClientId
+    AND ua.granted_user_id = @TrainerId";
+
+            var count = await _con.ExecuteScalarAsync<int>(
+                sql,
+                new { TrainerId = trainerId, ClientId = clientId, TaskId = clientTaskId }
+            );
+
+            return count > 0;
         }
 
         public async Task<bool> UpdateCommentAsync(TrainerComment comment)

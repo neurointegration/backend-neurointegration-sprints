@@ -103,7 +103,7 @@ namespace Api
                                 var auth = customHeaders.FirstOrDefault();
                                 if (!string.IsNullOrEmpty(auth))
                                 {
-                                    auth.Substring("Bearer ".Length).Trim();
+                                    auth.Substring("Bearer ".Length).Trim();    
                                 }
                             }
                             if (!string.IsNullOrEmpty(token))

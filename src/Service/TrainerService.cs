@@ -30,6 +30,21 @@ namespace Service
             return MapToClientResponse(client);
         }
 
+        public async Task<bool> HasAccessAsync(long treinerId, long clientId)
+        {
+            return await _trainerRepository.HasAccessAsync(treinerId, clientId);
+        }
+
+        public async Task<bool> HasProjectAccessAsync(long trainerId, long clientId, Guid clientProjectId)
+        {
+            return await _trainerRepository.HasProjectAccessAsync(trainerId, clientId, clientProjectId);
+        }
+
+        public async Task<bool> HasTaskAccessAsync(long trainerId, long clientId, Guid clientTaskId)
+        {
+            return await _trainerRepository.HasTaskAccessAsync(trainerId, clientId, clientTaskId);
+        }
+
         private ClientResponse MapToClientResponse(ApplicationUser user)
         {
             return new ClientResponse
