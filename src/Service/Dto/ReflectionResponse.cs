@@ -6,6 +6,7 @@ namespace Service.Dto
     {
         public SprintAnswerType AnswerType { get; set; }
         public long SprintNumber { get; set; }
+        public int SprintReplyNumber { get; set; }
         public DateOnly Date { get; set; }
         public string Answer { get; set; } = default!;
     }

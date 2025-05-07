@@ -55,6 +55,7 @@ SELECT
     scenario_type   AS {nameof(SprintAnswer.ScenarioType)},
     answer_type     AS {nameof(SprintAnswer.AnswerType)},
     sprint_number   AS {nameof(SprintAnswer.SprintNumber)},
+    sprint_reply_number AS {nameof(SprintAnswer.SprintReplyNumber)},
     date            AS {nameof(SprintAnswer.Date)},
     answer          AS {nameof(SprintAnswer.Answer)}
 FROM {Table}
@@ -73,6 +74,7 @@ SELECT
     scenario_type   AS {nameof(SprintAnswer.ScenarioType)},
     answer_type     AS {nameof(SprintAnswer.AnswerType)},
     sprint_number   AS {nameof(SprintAnswer.SprintNumber)},
+    sprint_reply_number AS {nameof(SprintAnswer.SprintReplyNumber)},
     date            AS {nameof(SprintAnswer.Date)},
     answer          AS {nameof(SprintAnswer.Answer)}
 FROM {Table}

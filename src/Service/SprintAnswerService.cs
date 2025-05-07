@@ -62,6 +62,7 @@ namespace Service
                 {
                     AnswerType = ans.AnswerType,
                     SprintNumber = ans.SprintNumber,
+                    SprintReplyNumber = ans.SprintReplyNumber,
                     Date = ans.Date,
                     Answer = ans.Answer
                 });
