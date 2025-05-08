@@ -39,7 +39,7 @@ namespace Service
             var project = new Project
             {
                 Id = Guid.NewGuid(),
-                SprintNumber = request.SprintNumber != 0 ? request.SprintNumber : request.SprintId,
+                SprintNumber = request.SprintNumber,
                 UserId = userId,
                 Title = request.Title,
                 SectionName = request.SectionName,

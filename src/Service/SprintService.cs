@@ -65,7 +65,6 @@ namespace Service
             }
             return new SprintResponse
             {
-                id = sprint.Number,
                 Number = sprint.Number,
                 UserId = sprint.UserId,
                 WeeksCount = weeksCount,

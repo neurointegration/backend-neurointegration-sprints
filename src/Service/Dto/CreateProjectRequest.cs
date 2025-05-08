@@ -4,7 +4,6 @@ namespace Service.Dto
 {
     public class CreateProjectRequest
     {
-        public long SprintId { get; set; } // TODO удалить
         public long SprintNumber { get; set; }
         public string Title { get; set; } = default!;
         public SectionName SectionName { get; set; }
