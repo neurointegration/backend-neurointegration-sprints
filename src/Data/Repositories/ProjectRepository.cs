@@ -7,7 +7,8 @@ namespace Data.Repositories
     public class ProjectRepository : IProjectRepository
     {
         private readonly IDbConnection _con;
-        private readonly string _projectsTable = "projects";
+        private readonly string _projectsTable = "projects              ";
+        private readonly string _tasksTable = "tasks";
 
         public ProjectRepository(IDbConnection con)
         {
@@ -122,6 +123,21 @@ VALUES
                     FactTimes = JsonSerializer.Serialize(project.FactTimes)
                 });
             return project;
+        }
+
+        public async Task DeleteProjectAsync(Guid projectId)
+        {
+            var deleteTasksSql = $@"
+DELETE FROM {_tasksTable}
+WHERE project_id = @ProjectId";
+            await _con.ExecuteAsync(deleteTasksSql,
+                new { ProjectId = projectId });
+
+            var deleteProjectSql = $@"
+DELETE FROM {_projectsTable}
+WHERE project_id = @ProjectId";
+            await _con.ExecuteAsync(deleteProjectSql,
+                new { ProjectId = projectId });
         }
     }
 }

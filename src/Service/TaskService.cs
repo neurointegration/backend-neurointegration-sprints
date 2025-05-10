@@ -66,6 +66,11 @@ namespace Service
             return MapToTaskResponse(updatedTask);
         }
 
+        public async Task DeleteTaskAsync(Guid taskId)
+        {
+            await _taskRepository.DeleteTaskAsync(taskId);
+        }
+
         private TaskResponse MapToTaskResponse(NeuroTask task)
         {
             return new TaskResponse

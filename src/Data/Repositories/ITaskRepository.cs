@@ -12,5 +12,6 @@ namespace Data.Repositories
         Task<IList<NeuroTask>> GetTasksByProjectIdAsync(Guid projectId);
         Task<NeuroTask> CreateTaskAsync(NeuroTask task);
         Task<NeuroTask> UpdateTaskAsync(NeuroTask task);
+        Task DeleteTaskAsync(Guid taskId);
     }
 }

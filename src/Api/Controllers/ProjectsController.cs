@@ -57,5 +57,12 @@ namespace Api.Controllers
                 return NotFound();
             }
         }
+
+        [HttpDelete("{projectId}")]
+        public async Task<ActionResult> DeleteProject(Guid projectId)
+        {
+            await _projectService.DeleteProjectAsync(projectId);
+            return Ok();
+        }
     }
 }

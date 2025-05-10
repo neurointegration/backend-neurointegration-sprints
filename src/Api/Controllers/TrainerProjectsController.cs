@@ -69,5 +69,17 @@ namespace Api.Controllers
                 return NotFound();
             }
         }
+
+        [HttpDelete("clients/{userId}/projects/{projectId}")]
+        public async Task<ActionResult> DeleteProject(long userId, Guid projectId)
+        {
+            var trainerId = User.GetUserId();
+            if (!await _trainerService.HasProjectAccessAsync(trainerId, userId, projectId))
+                return NotFound();
+
+            await _projectService.DeleteProjectAsync(projectId);
+
+            return Ok();
+        }
     }
 }

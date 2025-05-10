@@ -115,5 +115,13 @@ VALUES
                 });
             return task;
         }
+
+        public async Task DeleteTaskAsync(Guid taskId)
+        {
+            var sql = $@"
+DELETE FROM {_taskTable}
+WHERE task_id = @TaskId";
+            await _con.ExecuteAsync(sql, new { TaskId = taskId });
+        }
     }
 }

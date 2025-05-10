@@ -13,5 +13,6 @@ namespace Service
         Task<IList<TaskResponse>> GetTasksByProjectIdAsync(Guid projectId);
         Task<TaskResponse> CreateTaskAsync(CreateTaskRequest request);
         Task<TaskResponse> UpdateTaskAsync(UpdateTaskRequest request);
+        Task DeleteTaskAsync(Guid taskId);
     }
 }

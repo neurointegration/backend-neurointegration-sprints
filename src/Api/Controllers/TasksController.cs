@@ -54,5 +54,12 @@ namespace Api.Controllers
                 return NotFound();
             }
         }
+
+        [HttpDelete("{taskId}")]
+        public async Task<ActionResult> DeleteTask(Guid taskId)
+        {
+            await _taskService.DeleteTaskAsync(taskId);
+            return Ok();
+        }
     }
 }

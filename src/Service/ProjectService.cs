@@ -67,6 +67,11 @@ namespace Service
             return MapToProjectResponse(updatedProject);
         }
 
+        public async Task DeleteProjectAsync(Guid projectId)
+        {
+            await _projectRepository.DeleteProjectAsync(projectId);
+        }
+
         private ProjectResponse MapToProjectResponse(Project project)
         {
             return new ProjectResponse
