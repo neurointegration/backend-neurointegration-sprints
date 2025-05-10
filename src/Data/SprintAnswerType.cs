@@ -12,6 +12,7 @@ namespace Data
         ReflectionRegularCorrection,
         ReflectionRegularMyStatus,
         ReflectionRegularOrbits,
+        ReflectionWhatIDoing,
         ReflectionRegularWhatIDoing,
         Status
     }
