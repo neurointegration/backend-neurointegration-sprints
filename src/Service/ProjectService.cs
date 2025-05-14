@@ -41,6 +41,7 @@ namespace Service
                 Id = Guid.NewGuid(),
                 SprintNumber = request.SprintNumber,
                 UserId = userId,
+                CreatedAt = DateTime.UtcNow,
                 Title = request.Title,
                 SectionName = request.SectionName,
                 PlanningTimes = request.PlanningTimes,
@@ -77,6 +78,7 @@ namespace Service
             return new ProjectResponse
             {
                 Id = project.Id,
+                CreatedAt = project.CreatedAt,
                 Title = project.Title,
                 SectionName = project.SectionName,
                 PlanningTimes = project.PlanningTimes,

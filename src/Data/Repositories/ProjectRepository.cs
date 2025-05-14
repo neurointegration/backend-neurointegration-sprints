@@ -22,6 +22,7 @@ SELECT
     project_id AS {nameof(Project.Id)},
     chat_id AS {nameof(Project.UserId)},
     sprint_number AS {nameof(Project.SprintNumber)},
+    created_at AS {nameof(Project.CreatedAt)},
     section_name AS {nameof(Project.SectionName)},
     title AS {nameof(Project.Title)},
     planning_times AS {nameof(Project.PlanningTimes)},
@@ -39,12 +40,14 @@ SELECT
     project_id AS {nameof(Project.Id)},
     chat_id AS {nameof(Project.UserId)},
     sprint_number AS {nameof(Project.SprintNumber)},
+    created_at AS {nameof(Project.CreatedAt)},
     section_name AS {nameof(Project.SectionName)},
     title AS {nameof(Project.Title)},
     planning_times AS {nameof(Project.PlanningTimes)},
     fact_times AS {nameof(Project.FactTimes)}
 FROM {_projectsTable}
-WHERE chat_id = @UserId AND sprint_number = @SprintNumber";
+WHERE chat_id = @UserId AND sprint_number = @SprintNumber
+ORDER BY created_at DESC";
 
             var projects = await _con.QueryAsync<Project>(sql, new { UserId = userId, SprintNumber = sprintNumber });
             return projects.ToList();
@@ -58,6 +61,7 @@ UPSERT INTO {_projectsTable}
     project_id,
     chat_id,
     sprint_number,
+    created_at,
     section_name,
     title,
     planning_times,
@@ -68,6 +72,7 @@ VALUES
     @Id,
     @UserId,
     @SprintNumber,
+    @CreatedAt,
     @SectionName,
     @Title,
     @PlanningTimes,
@@ -80,6 +85,7 @@ VALUES
                     Id = project.Id,
                     UserId = project.UserId,
                     SprintNumber = project.SprintNumber,
+                    CreatedAt = project.CreatedAt,
                     SectionName = project.SectionName.ToString(),
                     Title = project.Title,
                     PlanningTimes = JsonSerializer.Serialize(project.PlanningTimes),

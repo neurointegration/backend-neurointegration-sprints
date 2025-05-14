@@ -20,6 +20,7 @@ namespace Data.Repositories
 SELECT
     task_id AS {nameof(NeuroTask.Id)},
     project_id AS {nameof(NeuroTask.ProjectId)},
+    created_at AS {nameof(NeuroTask.CreatedAt)},
     section_name AS {nameof(NeuroTask.SectionName)},
     title AS {nameof(NeuroTask.Title)},
     planning_times AS {nameof(NeuroTask.PlanningTimes)},
@@ -37,12 +38,14 @@ WHERE task_id = @TaskId";
 SELECT
     task_id AS {nameof(NeuroTask.Id)},
     project_id AS {nameof(NeuroTask.ProjectId)},
+    created_at AS {nameof(NeuroTask.CreatedAt)},
     section_name AS {nameof(NeuroTask.SectionName)},
     title AS {nameof(NeuroTask.Title)},
     planning_times AS {nameof(NeuroTask.PlanningTimes)},
     fact_times AS {nameof(NeuroTask.FactTimes)}
 FROM {_taskTable}
-WHERE project_id = @ProjectId";
+WHERE project_id = @ProjectId
+ORDER BY created_at DESC";
 
             var tasks = await _con.QueryAsync<NeuroTask>(sql, new { ProjectId = projectId });
             return tasks.ToList();
@@ -55,6 +58,7 @@ UPSERT INTO {_taskTable}
 (
     task_id,
     project_id,
+    created_at,
     section_name,
     title,
     planning_times,
@@ -64,6 +68,7 @@ VALUES
 (
     @Id,
     @ProjectId,
+    @CreatedAt,
     @SectionName,
     @Title,
     @PlanningTimes,
@@ -74,6 +79,7 @@ VALUES
                 {
                     Id = task.Id,
                     ProjectId = task.ProjectId,
+                    CreatedAt = task.CreatedAt,
                     SectionName = task.SectionName.ToString(),
                     Title = task.Title,
                     PlanningTimes = JsonSerializer.Serialize(task.PlanningTimes),

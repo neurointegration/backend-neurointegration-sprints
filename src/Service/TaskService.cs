@@ -40,6 +40,7 @@ namespace Service
             {
                 Id = Guid.NewGuid(),
                 ProjectId = request.ProjectId,
+                CreatedAt = DateTime.UtcNow,
                 Title = request.Title,
                 SectionName = request.SectionName,
                 PlanningTimes = request.PlanningTimes,
@@ -76,6 +77,7 @@ namespace Service
             return new TaskResponse
             {
                 Id = task.Id,
+                CreatedAt = task.CreatedAt,
                 Title = task.Title,
                 SectionName = task.SectionName,
                 PlanningTimes = task.PlanningTimes,

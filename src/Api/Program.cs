@@ -58,7 +58,7 @@ namespace Api
                 return new YdbConnection(ydbConnectionBuilder);
             });
 
-            SqlMapper.AddTypeMap(typeof(DateTime), DbType.DateTime);
+            SqlMapper.AddTypeMap(typeof(DateTime), DbType.DateTime2);
             SqlMapper.AddTypeHandler(new SqlDateOnlyTypeHandler());
             SqlMapper.AddTypeHandler(new SqlDictionaryTypeHandler<string, PlanningTime>());
             SqlMapper.AddTypeHandler(new SqlDictionaryTypeHandler<string, FactTime>());
