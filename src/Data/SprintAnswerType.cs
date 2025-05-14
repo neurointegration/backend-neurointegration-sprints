@@ -12,8 +12,15 @@ namespace Data
         ReflectionRegularCorrection,
         ReflectionRegularMyStatus,
         ReflectionRegularOrbits,
+        ReflectionRegularWhatINotDoing,
+        ReflectionRegularWhatIDoing, 
         ReflectionWhatIDoing,
-        ReflectionRegularWhatIDoing,
+        ReflectionIntegrationChanges,
+        ReflectionIntegrationActions,
+        ReflectionIntegrationAbilities,
+        ReflectionIntegrationBeliefs,
+        ReflectionIntegrationSelfPerception,
+        ReflectionIntegrationOpportunities,
         Status
     }
 }
