@@ -44,7 +44,7 @@ WHERE ua.granted_user_id = @TrainerId
         public async Task<IList<ApplicationUser>> GetClientsAsync(long trainerId)
         {
             var sql = $@"
-SELECT ui.chat_id AS {nameof(ApplicationUser.Id)},
+SELECT DISTINCT ui.chat_id AS {nameof(ApplicationUser.Id)},
        ui.email AS {nameof(ApplicationUser.Email)},
        ui.username AS {nameof(ApplicationUser.UserName)},
        ui.iam_coach AS {nameof(ApplicationUser.IAmCoach)},
