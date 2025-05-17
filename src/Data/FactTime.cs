@@ -14,10 +14,10 @@ namespace Data
     public class FactTime
     {
         [Range(0, 100, ErrorMessage = "Hours must be between 0 and 100.")]
-        public int Hours { get; set; }
+        public int? Hours { get; set; }
 
         [Range(0, 59, ErrorMessage = "Minutes must be between 0 and 59.")]
-        public int Minutes { get; set; }
+        public int? Minutes { get; set; }
 
         public TimeStatus? Status { get; set; }
     }
