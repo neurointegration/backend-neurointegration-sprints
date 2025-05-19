@@ -33,10 +33,6 @@ namespace Api.Controllers
             {
                 return NotFound(new { message = ex.Message });
             }
-            catch (TrainerNotInBotException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
         }
 
         [HttpGet("trainer")]

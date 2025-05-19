@@ -1,5 +1,6 @@
 ﻿using Data.Repositories;
 using Service.Dto;
+using Service.Exceptions;
 
 namespace Service
 {
@@ -19,9 +20,13 @@ namespace Service
             _userRepository = userRepository;
         }
 
-        public Task AssignTrainerAsync(long userId, string trainerUsername)
+        public async Task AssignTrainerAsync(long userId, string trainerUsername)
         {
-            throw new NotImplementedException("This method is outdated");
+            var trainer = await _trainerRepository.GetTrainerByUserNameAsync(trainerUsername);
+            if (trainer == null)
+                throw new TrainerNotFoundException($"Trainer with username '{trainerUsername}' not found.");
+            await _trainerRepository.DeleteTrainerAccessAsync(userId);
+            await _trainerRepository.AddTrainerAccessAsync(userId, trainer.Id);
         }
 
         public async Task<ClientResponse?> GetTrainerAsync(long userId)
