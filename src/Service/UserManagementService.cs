@@ -26,7 +26,7 @@ namespace Service
             if (trainer == null)
                 throw new TrainerNotFoundException($"Trainer with username '{trainerUsername}' not found.");
             await _trainerRepository.DeleteTrainerAccessAsync(userId);
-            await _trainerRepository.AddTrainerAccessAsync(userId, trainer.Id);
+            await _trainerRepository.AddTrainerAccessAsync(trainer.Id, userId);
         }
 
         public async Task<ClientResponse?> GetTrainerAsync(long userId)
