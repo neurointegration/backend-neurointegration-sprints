@@ -31,7 +31,7 @@
    ```
 
 4. Swagger-документация будет доступна по адресу:
-   [http://localhost:8080/swagger/index.html](http://localhost:8080/swagger/index.html)
+   [http://localhost/swagger/index.html](http://localhost/swagger/index.html)
 
 ### Остановка приложения
 
